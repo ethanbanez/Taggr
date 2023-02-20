@@ -20,9 +20,8 @@ class BLEPeripheral: NSObject, ObservableObject {
   let uuid: String
   init(uuid: String) {
     self.uuid = uuid
-    manager = CBPeripheralManager(delegate: nil, queue: .main, options: [CBPeripheralManagerOptionRestoreIdentifierKey: uuid])
+    manager = CBPeripheralManager(delegate: nil, queue: .global())
     super.init()
-    preparePerpipheral(uuidString: uuid)
     log.info("BLEPeripheral is initialized")
   }
   deinit {
@@ -34,9 +33,4 @@ class BLEPeripheral: NSObject, ObservableObject {
       the TagService always has the tag characteristic as
       the peripheral will always be the one who is currently tagged
    */
-  public func preparePerpipheral(uuidString: String) {
-//    var uuid = UUID(uuidString: uuidString)
-    var tagService: TagService = TagService()
-    manager.add(tagService.service)
-  }
 }

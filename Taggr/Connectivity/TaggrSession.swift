@@ -12,7 +12,11 @@ import struct os.Logger
 // my own session class
 class TaggrSession: NSObject, ObservableObject {
   /* I can use a unique service type for each taggr_group to specify specific devices */
-  
+  private let serviceType = "taggr-session"
+  private let peerID = MCPeerID(displayName: UIDevice.current.name)
+  private let taggrSession: MCSession
+  private let taggrBrowser: MCNearbyServiceBrowser
+  private let taggrAdvertiser: MCNearbyServiceAdvertiser
   
   // should this be private??
   private let log = Logger(subsystem: Subsystem.connectivity.description, category: "session")

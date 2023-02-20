@@ -7,23 +7,17 @@
 
 import Foundation
 import CoreBluetooth
+import os
 
 /* Tag Service should be unique for each group made but the same for all devices in the group
     so that the central know what to write to */
-let serviceUUID = CBUUID(string: "com.taggr.bluetooth.service.group-id-here")
-let characteristicUUID = CBUUID(string: "com.taggr.characteristic.group-id-here")
+let globalServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD07A961")
+let globalCharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6FAEB13D4")
 
 struct TagService {
-  var service: CBMutableService
-  var characteristic: CBMutableCharacteristic
-  init() {
-    service = CBMutableService(type: serviceUUID, primary: true)
-    characteristic = CBMutableCharacteristic(type: characteristicUUID,
-                                             properties: CBCharacteristicProperties(arrayLiteral: [.writeWithoutResponse]),
-                                             value: Data([0x0]),
-                                             permissions: [.writeable])
-    
-    /* how many characteristics do I need for the service? I think just the tag status… or maybe the location data? */
-    service.characteristics = [characteristic]
-  }
+  var serviceUUID = globalServiceUUID
+  var characteristicUUID = globalCharacteristicUUID
+  var service: CBMutableService = CBMutableService(type: globalServiceUUID, primary: true)
+  var characteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: globalCharacteristicUUID,
+                                                    properties: [.writeWithoutResponse], value: nil, permissions: [.writeable])
 }
