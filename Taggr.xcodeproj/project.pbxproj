@@ -1,0 +1,689 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E7232939298DC28F00FF45EA /* Subsytems.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7232938298DC28F00FF45EA /* Subsytems.swift */; };
+		E723294C298E6EAA00FF45EA /* Taggr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E723294A298E6EAA00FF45EA /* Taggr.xcdatamodeld */; };
+		E7285DFE299824A0000B31F4 /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7285DFD299824A0000B31F4 /* BLEManager.swift */; };
+		E75EE85D299F521B00066145 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75EE85C299F521B00066145 /* StatusView.swift */; };
+		E75EE85F299F5EF800066145 /* TaggrAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75EE85E299F5EF800066145 /* TaggrAppDelegate.swift */; };
+		E76AC57B2991C5EA0024474C /* BLECentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76AC57A2991C5EA0024474C /* BLECentral.swift */; };
+		E76AC57D2991D2CD0024474C /* BLEPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76AC57C2991D2CD0024474C /* BLEPeripheral.swift */; };
+		E76AC57F2991DB980024474C /* TagService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76AC57E2991DB980024474C /* TagService.swift */; };
+		E79E50FB298D23F0004036B8 /* TaggrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E50FA298D23F0004036B8 /* TaggrApp.swift */; };
+		E79E50FD298D23F0004036B8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E50FC298D23F0004036B8 /* ContentView.swift */; };
+		E79E50FF298D23F3004036B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E79E50FE298D23F3004036B8 /* Assets.xcassets */; };
+		E79E5102298D23F3004036B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E79E5101298D23F3004036B8 /* Preview Assets.xcassets */; };
+		E79E5104298D23F3004036B8 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E5103298D23F3004036B8 /* Persistence.swift */; };
+		E79E5111298D23F3004036B8 /* TaggrTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E5110298D23F3004036B8 /* TaggrTests.swift */; };
+		E79E511B298D23F3004036B8 /* TaggrUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E511A298D23F3004036B8 /* TaggrUITests.swift */; };
+		E79E511D298D23F3004036B8 /* TaggrUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E511C298D23F3004036B8 /* TaggrUITestsLaunchTests.swift */; };
+		E79E512B298D2428004036B8 /* TaggrSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E512A298D2428004036B8 /* TaggrSession.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E79E510D298D23F3004036B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E79E50EF298D23F0004036B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E79E50F6298D23F0004036B8;
+			remoteInfo = Taggr;
+		};
+		E79E5117298D23F3004036B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E79E50EF298D23F0004036B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E79E50F6298D23F0004036B8;
+			remoteInfo = Taggr;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E7232938298DC28F00FF45EA /* Subsytems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subsytems.swift; sourceTree = "<group>"; };
+		E723294B298E6EAA00FF45EA /* Taggr.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Taggr.xcdatamodel; sourceTree = "<group>"; };
+		E7285DFD299824A0000B31F4 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		E75EE85C299F521B00066145 /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		E75EE85E299F5EF800066145 /* TaggrAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrAppDelegate.swift; sourceTree = "<group>"; };
+		E76AC57A2991C5EA0024474C /* BLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLECentral.swift; sourceTree = "<group>"; };
+		E76AC57C2991D2CD0024474C /* BLEPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEPeripheral.swift; sourceTree = "<group>"; };
+		E76AC57E2991DB980024474C /* TagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagService.swift; sourceTree = "<group>"; };
+		E79E50F7298D23F0004036B8 /* Taggr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Taggr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E79E50FA298D23F0004036B8 /* TaggrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrApp.swift; sourceTree = "<group>"; };
+		E79E50FC298D23F0004036B8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E79E50FE298D23F3004036B8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E79E5101298D23F3004036B8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E79E5103298D23F3004036B8 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		E79E510C298D23F3004036B8 /* TaggrTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaggrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E79E5110298D23F3004036B8 /* TaggrTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrTests.swift; sourceTree = "<group>"; };
+		E79E5116298D23F3004036B8 /* TaggrUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaggrUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E79E511A298D23F3004036B8 /* TaggrUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrUITests.swift; sourceTree = "<group>"; };
+		E79E511C298D23F3004036B8 /* TaggrUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E79E512A298D2428004036B8 /* TaggrSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrSession.swift; sourceTree = "<group>"; };
+		E79E512C298D28F2004036B8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E79E50F4298D23F0004036B8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E5109298D23F3004036B8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E5113298D23F3004036B8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E7232937298DC28400FF45EA /* Log */ = {
+			isa = PBXGroup;
+			children = (
+				E7232938298DC28F00FF45EA /* Subsytems.swift */,
+			);
+			path = Log;
+			sourceTree = "<group>";
+		};
+		E76AC571298EE0190024474C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E79E50FC298D23F0004036B8 /* ContentView.swift */,
+				E75EE85C299F521B00066145 /* StatusView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E76AC5792991C5D50024474C /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				E7285DFD299824A0000B31F4 /* BLEManager.swift */,
+				E76AC57A2991C5EA0024474C /* BLECentral.swift */,
+				E76AC57C2991D2CD0024474C /* BLEPeripheral.swift */,
+				E76AC57E2991DB980024474C /* TagService.swift */,
+			);
+			path = Bluetooth;
+			sourceTree = "<group>";
+		};
+		E79E50EE298D23F0004036B8 = {
+			isa = PBXGroup;
+			children = (
+				E79E50F9298D23F0004036B8 /* Taggr */,
+				E79E510F298D23F3004036B8 /* TaggrTests */,
+				E79E5119298D23F3004036B8 /* TaggrUITests */,
+				E79E50F8298D23F0004036B8 /* Products */,
+			);
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+		};
+		E79E50F8298D23F0004036B8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E79E50F7298D23F0004036B8 /* Taggr.app */,
+				E79E510C298D23F3004036B8 /* TaggrTests.xctest */,
+				E79E5116298D23F3004036B8 /* TaggrUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E79E50F9298D23F0004036B8 /* Taggr */ = {
+			isa = PBXGroup;
+			children = (
+				E723294A298E6EAA00FF45EA /* Taggr.xcdatamodeld */,
+				E79E512C298D28F2004036B8 /* Info.plist */,
+				E79E50FA298D23F0004036B8 /* TaggrApp.swift */,
+				E75EE85E299F5EF800066145 /* TaggrAppDelegate.swift */,
+				E76AC571298EE0190024474C /* Views */,
+				E79E50FE298D23F3004036B8 /* Assets.xcassets */,
+				E79E5103298D23F3004036B8 /* Persistence.swift */,
+				E79E5129298D2402004036B8 /* Connectivity */,
+				E7232937298DC28400FF45EA /* Log */,
+				E79E5100298D23F3004036B8 /* Preview Content */,
+			);
+			indentWidth = 2;
+			path = Taggr;
+			sourceTree = "<group>";
+			tabWidth = 2;
+		};
+		E79E5100298D23F3004036B8 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				E79E5101298D23F3004036B8 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		E79E510F298D23F3004036B8 /* TaggrTests */ = {
+			isa = PBXGroup;
+			children = (
+				E79E5110298D23F3004036B8 /* TaggrTests.swift */,
+			);
+			path = TaggrTests;
+			sourceTree = "<group>";
+		};
+		E79E5119298D23F3004036B8 /* TaggrUITests */ = {
+			isa = PBXGroup;
+			children = (
+				E79E511A298D23F3004036B8 /* TaggrUITests.swift */,
+				E79E511C298D23F3004036B8 /* TaggrUITestsLaunchTests.swift */,
+			);
+			path = TaggrUITests;
+			sourceTree = "<group>";
+		};
+		E79E5129298D2402004036B8 /* Connectivity */ = {
+			isa = PBXGroup;
+			children = (
+				E76AC5792991C5D50024474C /* Bluetooth */,
+				E79E512A298D2428004036B8 /* TaggrSession.swift */,
+			);
+			path = Connectivity;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E79E50F6298D23F0004036B8 /* Taggr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E79E5120298D23F3004036B8 /* Build configuration list for PBXNativeTarget "Taggr" */;
+			buildPhases = (
+				E79E50F3298D23F0004036B8 /* Sources */,
+				E79E50F4298D23F0004036B8 /* Frameworks */,
+				E79E50F5298D23F0004036B8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Taggr;
+			productName = Taggr;
+			productReference = E79E50F7298D23F0004036B8 /* Taggr.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E79E510B298D23F3004036B8 /* TaggrTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E79E5123298D23F3004036B8 /* Build configuration list for PBXNativeTarget "TaggrTests" */;
+			buildPhases = (
+				E79E5108298D23F3004036B8 /* Sources */,
+				E79E5109298D23F3004036B8 /* Frameworks */,
+				E79E510A298D23F3004036B8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E79E510E298D23F3004036B8 /* PBXTargetDependency */,
+			);
+			name = TaggrTests;
+			productName = TaggrTests;
+			productReference = E79E510C298D23F3004036B8 /* TaggrTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E79E5115298D23F3004036B8 /* TaggrUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E79E5126298D23F3004036B8 /* Build configuration list for PBXNativeTarget "TaggrUITests" */;
+			buildPhases = (
+				E79E5112298D23F3004036B8 /* Sources */,
+				E79E5113298D23F3004036B8 /* Frameworks */,
+				E79E5114298D23F3004036B8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E79E5118298D23F3004036B8 /* PBXTargetDependency */,
+			);
+			name = TaggrUITests;
+			productName = TaggrUITests;
+			productReference = E79E5116298D23F3004036B8 /* TaggrUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E79E50EF298D23F0004036B8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					E79E50F6298D23F0004036B8 = {
+						CreatedOnToolsVersion = 14.2;
+					};
+					E79E510B298D23F3004036B8 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = E79E50F6298D23F0004036B8;
+					};
+					E79E5115298D23F3004036B8 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = E79E50F6298D23F0004036B8;
+					};
+				};
+			};
+			buildConfigurationList = E79E50F2298D23F0004036B8 /* Build configuration list for PBXProject "Taggr" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E79E50EE298D23F0004036B8;
+			productRefGroup = E79E50F8298D23F0004036B8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E79E50F6298D23F0004036B8 /* Taggr */,
+				E79E510B298D23F3004036B8 /* TaggrTests */,
+				E79E5115298D23F3004036B8 /* TaggrUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E79E50F5298D23F0004036B8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E79E5102298D23F3004036B8 /* Preview Assets.xcassets in Resources */,
+				E79E50FF298D23F3004036B8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E510A298D23F3004036B8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E5114298D23F3004036B8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E79E50F3298D23F0004036B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E79E5104298D23F3004036B8 /* Persistence.swift in Sources */,
+				E76AC57D2991D2CD0024474C /* BLEPeripheral.swift in Sources */,
+				E7232939298DC28F00FF45EA /* Subsytems.swift in Sources */,
+				E723294C298E6EAA00FF45EA /* Taggr.xcdatamodeld in Sources */,
+				E75EE85D299F521B00066145 /* StatusView.swift in Sources */,
+				E76AC57B2991C5EA0024474C /* BLECentral.swift in Sources */,
+				E79E50FD298D23F0004036B8 /* ContentView.swift in Sources */,
+				E7285DFE299824A0000B31F4 /* BLEManager.swift in Sources */,
+				E76AC57F2991DB980024474C /* TagService.swift in Sources */,
+				E79E50FB298D23F0004036B8 /* TaggrApp.swift in Sources */,
+				E75EE85F299F5EF800066145 /* TaggrAppDelegate.swift in Sources */,
+				E79E512B298D2428004036B8 /* TaggrSession.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E5108298D23F3004036B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E79E5111298D23F3004036B8 /* TaggrTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E5112298D23F3004036B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E79E511D298D23F3004036B8 /* TaggrUITestsLaunchTests.swift in Sources */,
+				E79E511B298D23F3004036B8 /* TaggrUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E79E510E298D23F3004036B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E79E50F6298D23F0004036B8 /* Taggr */;
+			targetProxy = E79E510D298D23F3004036B8 /* PBXContainerItemProxy */;
+		};
+		E79E5118298D23F3004036B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E79E50F6298D23F0004036B8 /* Taggr */;
+			targetProxy = E79E5117298D23F3004036B8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E79E511E298D23F3004036B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E79E511F298D23F3004036B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E79E5121298D23F3004036B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Taggr/Preview Content\"";
+				DEVELOPMENT_TEAM = ZNS55HALJU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Taggr/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github-ethanbanez.Taggr";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E79E5122298D23F3004036B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Taggr/Preview Content\"";
+				DEVELOPMENT_TEAM = ZNS55HALJU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Taggr/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github-ethanbanez.Taggr";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E79E5124298D23F3004036B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZNS55HALJU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github-ethanbanez.TaggrTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Taggr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Taggr";
+			};
+			name = Debug;
+		};
+		E79E5125298D23F3004036B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZNS55HALJU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github-ethanbanez.TaggrTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Taggr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Taggr";
+			};
+			name = Release;
+		};
+		E79E5127298D23F3004036B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZNS55HALJU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github-ethanbanez.TaggrUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Taggr;
+			};
+			name = Debug;
+		};
+		E79E5128298D23F3004036B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZNS55HALJU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github-ethanbanez.TaggrUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Taggr;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E79E50F2298D23F0004036B8 /* Build configuration list for PBXProject "Taggr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E79E511E298D23F3004036B8 /* Debug */,
+				E79E511F298D23F3004036B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E79E5120298D23F3004036B8 /* Build configuration list for PBXNativeTarget "Taggr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E79E5121298D23F3004036B8 /* Debug */,
+				E79E5122298D23F3004036B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E79E5123298D23F3004036B8 /* Build configuration list for PBXNativeTarget "TaggrTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E79E5124298D23F3004036B8 /* Debug */,
+				E79E5125298D23F3004036B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E79E5126298D23F3004036B8 /* Build configuration list for PBXNativeTarget "TaggrUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E79E5127298D23F3004036B8 /* Debug */,
+				E79E5128298D23F3004036B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		E723294A298E6EAA00FF45EA /* Taggr.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				E723294B298E6EAA00FF45EA /* Taggr.xcdatamodel */,
+			);
+			currentVersion = E723294B298E6EAA00FF45EA /* Taggr.xcdatamodel */;
+			path = Taggr.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = E79E50EF298D23F0004036B8 /* Project object */;
+}
