@@ -22,7 +22,7 @@ class BLEPeripheral: NSObject, ObservableObject {
     self.uuid = uuid
     manager = CBPeripheralManager(delegate: nil, queue: .global())
     super.init()
-    log.info("BLEPeripheral is initialized")
+    log.info("BLEPeripheral is initialized with uuid \(uuid)")
   }
   deinit {
     manager.stopAdvertising()

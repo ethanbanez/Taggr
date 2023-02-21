@@ -58,11 +58,11 @@ class TaggrAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     log.info("willFinishLaunchingWithOptions restoring uuids for central: \(centraluuid.uuidString)")
     log.info("willFinishLaunchingWithOptions restoring uuids for peripheral: \(peripheraluuid.uuidString)")
     
-    bluetoothManager.central = BLECentral(uuid: centraluuid.uuidString)
-    bluetoothManager.central.manager.delegate = bluetoothManager
-      
-    bluetoothManager.peripheral = BLEPeripheral(uuid: peripheraluuid.uuidString)
-    bluetoothManager.peripheral.manager.delegate = bluetoothManager
+//    bluetoothManager.central = BLECentral(uuid: centraluuid.uuidString)
+//    bluetoothManager.central.manager.delegate = bluetoothManager
+//
+//    bluetoothManager.peripheral = BLEPeripheral(uuid: peripheraluuid.uuidString)
+//    bluetoothManager.peripheral.manager.delegate = bluetoothManager
     
     log.info("willFinishLaunchingWithOptions launch options available. Reinstantiated central and peripheral managers")
     return true

@@ -25,7 +25,7 @@ class BLECentral: NSObject, ObservableObject {
     /* Possibly add other options? Like a list of peripherals to look out for? */
     manager = CBCentralManager(delegate: nil, queue: .global(), options: [CBCentralManagerOptionShowPowerAlertKey: false])
     super.init()
-    log.info("BLECentral is initialized")
+    log.info("BLECentral is initialized with uuid: \(uuid)")
     
     /* do we need these options? */
 //    manager.registerForConnectionEvents(options: [CBConnectionEventMatchingOption(rawValue: CBConnectPeripheralOptionNotifyOnNotificationKey): true, CBConnectionEventMatchingOption(rawValue: CBConnectPeripheralOptionNotifyOnConnectionKey): true])

@@ -15,9 +15,9 @@ let globalServiceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD07A961")
 let globalCharacteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6FAEB13D4")
 
 struct TagService {
-  var serviceUUID = globalServiceUUID
-  var characteristicUUID = globalCharacteristicUUID
-  var service: CBMutableService = CBMutableService(type: globalServiceUUID, primary: true)
-  var characteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: globalCharacteristicUUID,
-                                                    properties: [.writeWithoutResponse], value: nil, permissions: [.writeable])
+  static var serviceUUID = globalServiceUUID
+  static var characteristicUUID = globalCharacteristicUUID
+  static var service: CBMutableService = CBMutableService(type: globalServiceUUID, primary: true)
+  static var characteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: globalCharacteristicUUID,
+                                                                        properties: [.writeWithoutResponse], value: nil, permissions: [.writeable, .readable])
 }

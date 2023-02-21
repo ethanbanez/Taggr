@@ -23,7 +23,7 @@ struct TaggrApp: App {
   /* we need to reinstantiate central and peripheral and insert it into a manager */
   
   /* here we define one bluetooth manager to be created and sent into the environment */
-  @StateObject var bluetoothManager: BLEManager = BLEManager(central: BLECentral(uuid: UUID().uuidString), peripheral: BLEPeripheral(uuid: UUID().uuidString))
+  @StateObject var bluetoothManager: BLEManager = BLEManager(central: UUID(), peripheral: UUID())
 
   
   init() {
