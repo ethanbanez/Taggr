@@ -13,12 +13,12 @@ import SwiftUI
  */
 struct PeripheralView: View {
   
-  @EnvironmentObject var bluetoothManager: BLEManager
+  var bluetoothManager = BLEManager.shared
   
   var body: some View {
     ForEach(bluetoothManager.discoveredPeripherals!, id: \.self, content: {
       peripheral in Text(peripheral.description).onTapGesture {
-        bluetoothManager.central.connect(peripheral)
+        bluetoothManager.central?.connect(peripheral)
       }
     })
   }

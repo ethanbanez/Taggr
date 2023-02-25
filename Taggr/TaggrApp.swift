@@ -23,8 +23,6 @@ struct TaggrApp: App {
   /* we need to reinstantiate central and peripheral and insert it into a manager */
   
   /* here we define one bluetooth manager to be created and sent into the environment */
-  @StateObject var bluetoothManager: BLEManager = BLEManager(central: UUID(), peripheral: UUID())
-
   
   init() {
     log.info("App is being initialized")
@@ -38,7 +36,7 @@ struct TaggrApp: App {
     WindowGroup {
       StatusView()
         .environment(\.managedObjectContext, persistenceController.container.viewContext)
-        .environmentObject(bluetoothManager)        /* this puts a single instance of bluetoothManager in the environment for all views to access */
+//        .environmentObject(bluetoothManager)        /* this puts a single instance of bluetoothManager in the environment for all views to access */
     }
   }
 }

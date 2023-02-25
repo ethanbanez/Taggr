@@ -10,10 +10,10 @@ import SwiftUI
 
 struct StatusView: View {
   
-  /* we expect to find a bluetooth manager in the environment passed from main App */
-  @EnvironmentObject var bluetoothManager: BLEManager
-  
   /* we access the bluetooth managers published property */
+  
+  @ObservedObject var bluetoothManager = BLEManager.shared    // gain access to the shared bluetooth manager singleton
+  
   var body: some View {
     HStack (alignment: .top) {
       Text("Tag Status:").bold()

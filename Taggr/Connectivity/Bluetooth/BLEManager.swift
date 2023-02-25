@@ -16,21 +16,36 @@ import os
 /* should this also be the peripheral and central delegate so then  */
 
 
+// this creates a global BLE manager
+//let globalBLEManager = BLEManager(central: UUID(), peripheral: UUID())
 
 /* we need to be able to reconnect the manager to the restored centrals */
+
+/*
+ IMPORTANT: no need to instantiate central or peripheral here. We should define the class as the delegates and implement the methods but then
+ allow it to be assigned to a central and peripheral at the start of the app so that the central and peripheral managers can be reinstantiated
+ */
 class BLEManager: NSObject, ObservableObject {
   
+  static let shared = BLEManager()
+  
   private let log: Logger = Logger(subsystem: Subsystem.connectivity.description, category: "BLEManager")
-  @State var tagged: Bool
-  @State var discoveredPeripherals: [CBPeripheral]?
+  @Published var tagged: Bool
+  @Published var discoveredPeripherals: [CBPeripheral]?
   
   // BLEManager variables
   /* we need to receive these objects from somewhere else… in the initializer? */
-  var central: CBCentralManager!
-  var peripheral: CBPeripheralManager!
+  var central: CBCentralManager?
+  var peripheral: CBPeripheralManager?
+  
+  /* these are the uuids of the peripheral and central objects that it is managing */
+  // how will I get these though if BLEManager isn't the one that makes them?
+  // I can make them global variables as well…
+  var peripheralUUID: UUID?
+  var centralUUID: UUID?
   
   /* reference to the currently connected peripherals of the central */
-  var connectedPeripherals: [CBPeripheral]!
+  private var connectedPeripherals: [CBPeripheral]!
   
   
   /* reference to the advertisement data of the peripheral */
@@ -39,62 +54,111 @@ class BLEManager: NSObject, ObservableObject {
   /* this is a reference to the uuid that, when the app is a tagger, to connect to */
   private var uuidToConnectTo: UUID?
   
-  /* these are the uuids of the peripheral and central objects that it is managing */
-  private var peripheralUUID: UUID
-  private var centralUUID: UUID
-  
-  
   // Central delegate variables
-  var currentlyConnectedPeripheral: CBPeripheral!
+  // good for setting the delegates and conditional
+  private var currentlyConnectedPeripheral: CBPeripheral?
+  private var numberOfWrites = 0
   
   // Peripheral delegate variables
-  var previousCharacteristicValue: String!
+  // why store the previous characteristic value?
+  private var previousCharacteristicValue: String?
   
   /* initialization */
-  init(central: UUID, peripheral: UUID) {
+  override init() {
     log.info("BLEManager intialization in progress")
     tagged = UserDefaults.standard.bool(forKey: "isTagged")
-    
-    self.centralUUID = central
-    self.peripheralUUID = peripheral
-    // this can only be run when the bluetooth power is on!
-    /* set up ad Data and service */
-//    self.peripheral.manager.add(tagService.service)
-    
     advertisementData = [CBAdvertisementDataServiceUUIDsKey: [TagService.serviceUUID]] as [String : Any]
-    
-    // must retrieve connecte peripherals during initialization??
-//    self.connectedPeripherals = central.manager.retrieveConnectedPeripherals(withServices: [tagService.service.uuid])
-    
     super.init()
-    
-    self.central = CBCentralManager(delegate: self, queue: .main, options: [CBCentralManagerOptionRestoreIdentifierKey: central.uuidString])
-    self.peripheral = CBPeripheralManager(delegate: self, queue: .main, options: [CBPeripheralManagerOptionRestoreIdentifierKey: peripheral.uuidString])
+    if ProcessInfo.processInfo.operatingSystemVersion.minorVersion == 3 {
+      updateTag(tagged: false)
+    }
     log.info("BLEManager completed initialization")
   }
   
   /* deinitialization */
   deinit {
-    central.stopScan()
-    peripheral.stopAdvertising()
+    central?.stopScan()
+    central = nil
+    peripheral?.stopAdvertising()
+    peripheral = nil
     log.info("BLEManager is deinitialized")
   }
   
+  private func updateTag(tagged: Bool) {
+    log.info("updating tag status")
+    transition(tagged: tagged)
+    self.tagged = tagged
+    UserDefaults.standard.set(tagged, forKey: "isTagged")
+  }
+  
+  
+  /*
+   Transition from either central/peripheral to the other to reflect transitions from not tagged/tagged
+   */
+  private func transition(tagged: Bool) {
+    // if tagged is now true then we become peripheral, otherwise we become central
+    if tagged == true {
+      log.info("Got tagged; transitioning to peripheral")
+      central?.stopScan()
+      
+      TagService.service.characteristics = [TagService.characteristic]
+      peripheral?.add(TagService.service)
+      peripheral?.startAdvertising(advertisementData)
+      
+    } else {
+      log.info("successfully tagged; transitioning to central")
+      peripheral?.removeAllServices()
+      peripheral?.stopAdvertising()
+      
+      central?.connect(retrievePeripheral(uuid: uuidToConnectTo!))
+    }
+    return
+  }
+  
+  
   
   // Central delegate helper methods
+  private func retrievePeripheral(uuid: UUID) -> CBPeripheral {
+    log.info("retrieving peripheral with uuid: \(uuid.uuidString)")
+    let specificPeripheral = central?.retrievePeripherals(withIdentifiers: [uuid])
+    
+    /*
+     if the following optional errors out because it is nil that means they have not connected before…
+      that means that they were not connected at the beginning of the game so they didn't go through
+      the synchronization process
+     */
+    return (specificPeripheral?.last)!
+  }
+  
+  
   
   private func retrievePeripherals() {
-    let knownConnectedPeripherals: [CBPeripheral] = central.retrieveConnectedPeripherals(withServices: [TagService.serviceUUID])
-    if let peripheral: CBPeripheral = knownConnectedPeripherals.last {
-      central.connect(peripheral)
-    } else {
-      /* may want to make CBCentralManagerScanOptionAllowDuplicatesKey: false when in actuality since we just want to connect as soon as in range */
+    
+    if let myCentral = central {
+      let knownConnectedPeripherals: [CBPeripheral] = myCentral.retrieveConnectedPeripherals(withServices: [TagService.serviceUUID])
+      if knownConnectedPeripherals.isEmpty == false {
+        discoveredPeripherals = knownConnectedPeripherals
+      }
+    
       log.info("centralDelegate retrievingPeripherals is scanning for service: \(TagService.serviceUUID)")
-      central.scanForPeripherals(withServices: [TagService.serviceUUID],
-                                 options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+      myCentral.scanForPeripherals(withServices: [TagService.serviceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+      // create a timeout for the last person discovered
+      
+    } else {
+      log.info("centralDelegate retrievingPeripherals central is nil")
+      return
     }
   }
   
+  
+  
+  private func preparePeripheral(peripheral: CBPeripheralManager) {
+    log.info("preparing peripheral")
+    TagService.service.characteristics = [TagService.characteristic]
+    peripheral.add(TagService.service)
+    peripheral.startAdvertising(advertisementData)
+    return
+  }
   
   // View methods
   
@@ -107,17 +171,17 @@ class BLEManager: NSObject, ObservableObject {
 
 extension BLEManager: CBCentralManagerDelegate {
   
+  
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
     switch central.state {
       /* when bluetooth is powered on then we can start scanning. But we want to only scan when we're not peripheral not just when we're on... */
     case CBManagerState.poweredOn :
       log.info("centralManagerDidUpdateState powered on")
-      let minorVersion = ProcessInfo().operatingSystemVersion.minorVersion
-      switch minorVersion {
-      case 5:
+      switch tagged {
+      case false:
         retrievePeripherals()
       default:
-        log.info("I am the iPad")
+        log.info("Currently tagged; acting as peripheral")
       }
       log.info("centralManagerDidUpdateState scanning for services with CBUUID: \(TagService.serviceUUID)")
     case CBManagerState.poweredOff :
@@ -136,78 +200,72 @@ extension BLEManager: CBCentralManagerDelegate {
     }
   }
   
+  
   /*
-   This callback function is executed when coming back from the background to continue doing a process
-   We want to use this functionality on certain times that they connect
-   this method is in the event that a central device connects to the peripheral it's been looking for
+   Should assign the central variable to the returned central object
    */
-  /* willRestoreState stores dictionaries of strings assosciated with what we want to restore */
   func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
-    log.info("BLEManager centralManager is restoring state")
+    log.info("centralDelegate is restoring state")
     /* just because the state has been restored does not mean that we were tagged just that the app has been reinitialized */
-    guard let id = dict[CBCentralManagerOptionRestoreIdentifierKey] as? String else {return}
-    self.central = CBCentralManager(delegate: self, queue: .global(), options: [CBCentralManagerOptionRestoreIdentifierKey: id])
-    
-    /* this callback will be used for switching the states from scanning to advertising as a peripheral */
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-      log.info("centralDelegate didConnect to peripheral: \(peripheral.identifier)")
-      
-      central.stopScan()
-      log.info("centralDelegate didConnect stopped scanning")
-      
-      /* set the peripheral delegate to the current BLEManager */
-      peripheral.delegate = self
-      
-      peripheral.discoverCharacteristics([TagService.characteristicUUID], for: TagService.service)
-      
-      var myPeripheralUUID: Data = Data()
-      withUnsafeBytes(of: self.peripheralUUID.uuid, {myPeripheralUUID.append(contentsOf: $0)})
-      log.info("centralDelegate didConnect writing bytes: \(myPeripheralUUID) to peripheral: \(peripheral.identifier)")
-      peripheral.writeValue(myPeripheralUUID, for: TagService.characteristic, type: .withoutResponse)
+    guard let centraluuid = dict[CBCentralManagerOptionRestoreIdentifierKey] as? String else {
+      log.info("centralDelegate willRestoreState no restoreIdentifier")
+      return
     }
-    
-    /* TEST METHODS */
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-      log.info("centralDelegate didDisconnectPeriphera from peripheral: \(peripheral.identifier)")
-      currentlyConnectedPeripheral = nil
-      
-      retrievePeripherals()
-    }
-    
-    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-      log.info("centralDelegate didFailToConnect to peripheral: \(peripheral.identifier)")
-      /* should deal with a failed connection appropriately */
-    }
-    
-    func centralManager(_ central: CBCentralManager, connectionEventDidOccur event: CBConnectionEvent, for peripheral: CBPeripheral) {
-      switch event {
-      case CBConnectionEvent.peerConnected:
-        log.info("centralDelegate connectionEventDidOccur peer connected with peripheral: \(peripheral.identifier)")
-      case CBConnectionEvent.peerDisconnected:
-        log.info("centralDelegate connectionEventDidOccur peer disconnected with peripheral: \(peripheral.identifier)")
-      @unknown default:
-        log.info("centralDelegate connectionEventDidOccur unknown event with peripheral: \(peripheral.identifier)")
-      }
-    }
-    
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-      log.info("centralDelegate didDiscover peripheral: \(peripheral.identifier) with ad data: \(advertisementData.description)")
-      
-      if currentlyConnectedPeripheral != peripheral {
-        currentlyConnectedPeripheral = peripheral
-        log.info("centralDelegate didDiscover connecting to peripheral")
-        
-        /*
-            we need to somehow wait and ask the user if they want to connect to a discoered peripheral
-            instead of connecting we can update a variable displaying the connected peripheral and then there can be a button
-            to tap if they want to connect to the peripheral
-         */
-        central.connect(peripheral, options: [CBConnectPeripheralOptionNotifyOnConnectionKey: true])
-      }
-      
-    }
-    
+    log.info("centralDelegate willRestoreState restoring with UUID: \(centraluuid)")
+    self.central = CBCentralManager(delegate: self, queue: .global(), options: [CBCentralManagerOptionRestoreIdentifierKey: centraluuid])
+    centralUUID = UUID(uuidString: centraluuid)
+    log.info("centralDelegate willRestoreState state restored")
   }
+  
+  
+  /* this callback will be used for switching the states from scanning to advertising as a peripheral */
+  func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    log.info("centralDelegate didConnect to peripheral: \(peripheral.identifier)")
+    
+    central.stopScan()
+    log.info("centralDelegate didConnect stopped scanning")
+    
+    /* set the peripheral delegate to the current BLEManager */
+    currentlyConnectedPeripheral = peripheral
+    discoveredPeripherals?.append(peripheral)
+    currentlyConnectedPeripheral?.delegate = self
+    currentlyConnectedPeripheral?.discoverServices([TagService.serviceUUID])
+  }
+  
+  
+  
+  /* TEST METHODS */
+  func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+    log.info("centralDelegate didDisconnectPeripheral from peripheral: \(peripheral.identifier)")
+    currentlyConnectedPeripheral = nil
+    retrievePeripherals()
+  }
+  
+  
+  
+  func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+    log.info("centralDelegate didFailToConnect to peripheral: \(peripheral.identifier)")
+    /* should deal with a failed connection appropriately */
+  }
+  
+  
+  
+  func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+    log.info("centralDelegate didDiscover peripheral: \(peripheral.identifier)")
+    
+    if currentlyConnectedPeripheral == nil {
+      currentlyConnectedPeripheral = peripheral
+      log.info("centralDelegate didDiscover connecting to peripheral")
+      
+      /*
+       we need to somehow wait and ask the user if they want to connect to a discoered peripheral
+       instead of connecting we can update a variable displaying the connected peripheral and then there can be a button
+       to tap if they want to connect to the peripheral
+       */
+      central.connect(peripheral, options: [CBConnectPeripheralOptionNotifyOnConnectionKey: true])
+    }
+  }
+  
 }
 
 
@@ -216,13 +274,6 @@ extension BLEManager: CBCentralManagerDelegate {
  */
 
 extension BLEManager: CBPeripheralDelegate {
-  func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
-    log.info("periperalDelegate didModifyServices")
-    for service in invalidatedServices where service.uuid == TagService.serviceUUID {
-      log.info("peripheralDelegate didModifyServices \(TagService.serviceUUID) has been invalidated")
-      peripheral.discoverServices([TagService.serviceUUID])
-    }
-  }
   
   /* did discover the service that we wanted */
   func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -237,6 +288,8 @@ extension BLEManager: CBPeripheralDelegate {
     }
   }
   
+  
+  
   /* did discover the characteristics that we wanted as well and then we just wait for data to come in */
   func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
     
@@ -244,28 +297,54 @@ extension BLEManager: CBPeripheralDelegate {
       log.info("peripheralDelegate didDiscoverCharactersticsFor error while discovering characteristics: \(error.localizedDescription)")
       return
     }
-    
-    log.info("peripheralDelegate didDiscoverCharactersticsFor service: \(service.uuid)")
     guard let serviceCharacteristics = service.characteristics else { return }
     
     for characteristic in serviceCharacteristics where characteristic.uuid == TagService.characteristicUUID {
       log.info("peripheralDelegate didDiscoverCharactersticsFor discovered characteristic \(characteristic.uuid)")
-      let charData = characteristic.value
-      previousCharacteristicValue = String(data: charData!, encoding: .utf8)
+      if let charData = characteristic.value {
+        previousCharacteristicValue = String(data: charData, encoding: .utf8)
+      } else {
+        previousCharacteristicValue = nil
+      }
+      
+      /*
+       HERE: Write to the peripheral the UUID of the central here!
+       */
+      
+//      var myPeripheralUUID: Data = Data()
+//      withUnsafeBytes(of: peripheralUUID, {myPeripheralUUID.append(contentsOf: $0)})
+      let myPeripheralUUID = Data((peripheralUUID?.uuidString.utf8)!)
+      log.info("peripheralDelegate didDiscoverCharacteristicsFor writing bytes: \(myPeripheralUUID) to peripheral: \(peripheral.identifier)")
+      
+      numberOfWrites += 1
+      let myString = String(data: myPeripheralUUID, encoding: .utf8)
+      log.info("peripheralDelegate didDiscoverCharacteristicsFor writing value: \(myString ?? "No value")")
+      peripheral.writeValue(myPeripheralUUID, for: characteristic, type: .withResponse)
+      log.info("peripheralDelegate number of writes: \(self.numberOfWrites)")
+      
+      updateTag(tagged: true)
     }
+    
+    /*
+     After writing, disconnect
+     */
+//    central?.stopScan()
+//    currentlyConnectedPeripheral = nil
+//    central?.scanForPeripherals(withServices: [TagService.serviceUUID])
   }
+  
+  
   
   /* this function only called when the withResponse option is enabled?? */
   func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
     if let error = error {
-      log.info("peripheralDelegate didWriteValueFor error while writing to characteristi: \(error.localizedDescription)")
+      log.info("peripheralDelegate didWriteValueFor error while writing to characteristic: \(error)")
       return
     }
-    
-    let charData = characteristic.value
-    let newValue = String(data: charData!, encoding: .utf8)!
-    log.info("peripheralDelegate didWriteValueFor characteristic \(characteristic.uuid) received value \(newValue)")
+    log.info("peripheralDelegate didWriteValueFor succeeded")
   }
+  
+  
   
   func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
     if let error = error {
@@ -275,9 +354,13 @@ extension BLEManager: CBPeripheralDelegate {
     
     let charData = characteristic.value
     let newValue = String(data: charData!, encoding: .utf8)!
-    log.info("peripheralDelegate didUpdateValueFor successfully updated value for characteristic: \(characteristic.uuid) from \(self.previousCharacteristicValue) to \(newValue)")
     previousCharacteristicValue = newValue
-    
+  }
+  
+  
+  
+  func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+    log.info("peripheralDelegate didModifyServices")
   }
 }
 
@@ -288,28 +371,32 @@ extension BLEManager: CBPeripheralDelegate {
 
 extension BLEManager: CBPeripheralManagerDelegate {
   
+  
   func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
     switch peripheral.state {
-    /* when bluetooth is powered on then we can start scanning. But we want to only scan when we're not peripheral not just when we're on... */
+      /* when bluetooth is powered on then we can start scanning. But we want to only scan when we're not peripheral not just when we're on... */
     case CBManagerState.poweredOn :
       log.info("peripheralManagerDidUpdateState powered on")
-      let minorVersion = ProcessInfo().operatingSystemVersion.minorVersion
       
-      switch minorVersion {
-      case 6:
+      switch tagged {
+      case true:
+//        TagService.service.characteristics = [TagService.characteristic]
+        
         TagService.service.characteristics = [TagService.characteristic]
-        log.info("TagService service characteristics \(TagService.service.characteristics!.count)")
         peripheral.add(TagService.service)
         peripheral.startAdvertising(advertisementData)
+        
+        log.info("TagService service characteristics \(TagService.service.characteristics!.count)")
+        
       default:
-        log.info("I am the iPhone")
+        log.info("Currently running; acting as central")
       }
       
     case CBManagerState.poweredOff :
       log.info("peripheralManagerDidUpdateState powered off")
       
       /*
-        should remove services here and stop advertising
+       should remove services here and stop advertising
        */
       peripheral.removeAllServices()
       peripheral.stopAdvertising()
@@ -327,8 +414,18 @@ extension BLEManager: CBPeripheralManagerDelegate {
   }
   
   
+  
   func peripheralManager(_ peripheral: CBPeripheralManager, willRestoreState dict: [String : Any]) {
-    log.info("peripheralManagerDelegate is restoring state")
+    log.info("peripheralManagerDelegate willRestoreState is restoring state")
+    
+    guard let peripheraluuid = dict[CBPeripheralManagerOptionRestoreIdentifierKey] as? String else {
+      log.info("peripheralManagerDelegate willRestoreState no restoration identifier")
+      return
+    }
+    log.info("peripheralManagerDelegate willRestoreState restoring peripheral with UUID: \(peripheraluuid)")
+    self.peripheral = CBPeripheralManager(delegate: self, queue: .main, options: [CBCentralManagerOptionRestoreIdentifierKey: peripheraluuid])
+    peripheralUUID = UUID(uuidString: peripheraluuid)
+    log.info("peripheralManagerDelegate willRestoreState state restored")
   }
   
   
@@ -337,8 +434,8 @@ extension BLEManager: CBPeripheralManagerDelegate {
   /* This callback can be used to transition and write the connected BLEManager's peripheral's uuid */
   func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
     /*
-        Use this function to write the connected manager's peripherals uuid
-        so that when this transitions from peripheral to central it has a uuid to connect to…
+     Use this function to write the connected manager's peripherals uuid
+     so that when this transitions from peripheral to central it has a uuid to connect to…
      */
     for request in requests {
       guard let requestValue = request.value, let uuid = String(data: requestValue, encoding: .utf8) else {
@@ -346,25 +443,38 @@ extension BLEManager: CBPeripheralManagerDelegate {
         continue
       }
       
+      
       log.info("peripheralManagerDelegate didReceiveWrite with value: \(uuid)")
       uuidToConnectTo = UUID(uuidString: uuid)
+      log.info("peripheralManagerDelegate didReceiveWrite uuidToConnectTo updated value to: \(self.uuidToConnectTo?.uuidString ?? "no value")")
       /* optional will need fixing */
+      updateTag(tagged: false)
     }
   }
+  
+  
   
   func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
     log.info("peripheralManagerDelegate started advertising")
   }
   
+  
+  
   func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
     log.info("peripheralManagerDelegate didSubscribeTo central \(central.identifier) subscribed to characteristic: \(characteristic.uuid)")
   }
+  
+  
   
   func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
     log.info("peripheralManagerDelegate didUnsubscribeFrom central unsubscribed from characteristic \(characteristic.uuid)")
   }
   
+  
+  
   func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
     log.info("peripheralManagerDelegate didAdd service \(service.uuid) added")
   }
+  
+  
 }
