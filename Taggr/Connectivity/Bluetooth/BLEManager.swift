@@ -25,11 +25,14 @@ import os
  IMPORTANT: no need to instantiate central or peripheral here. We should define the class as the delegates and implement the methods but then
  allow it to be assigned to a central and peripheral at the start of the app so that the central and peripheral managers can be reinstantiated
  */
+
+let defaults = UserDefaults.standard
+
 class BLEManager: NSObject, ObservableObject {
   
   static let shared = BLEManager()
   
-  private let log: Logger = Logger(subsystem: Subsystem.connectivity.description, category: "BLEManager")
+  private let log: Logger = Logger(subsystem: Subsystem.tag.description, category: "BLEManager")
   @Published var tagged: Bool
   @Published var discoveredPeripherals: [CBPeripheral]?
   
@@ -63,11 +66,28 @@ class BLEManager: NSObject, ObservableObject {
   // why store the previous characteristic value?
   private var previousCharacteristicValue: String?
   
+  var tagService: TagService
+  
   /* initialization */
   override init() {
     log.info("BLEManager intialization in progress")
-    tagged = UserDefaults.standard.bool(forKey: "isTagged")
-    advertisementData = [CBAdvertisementDataServiceUUIDsKey: [TagService.serviceUUID]] as [String : Any]
+    tagged = defaults.bool(forKey: "isTagged")
+    
+    let serviceUUID = CBUUID(string: defaults.string(forKey: "TagServiceUUID") ?? {
+      let uuid = UUID().uuidString
+      defaults.set(uuid, forKey: "TagServiceUUID")
+      return uuid
+    }())
+    
+    let characteristicUUID = CBUUID(string: defaults.string(forKey: "TagCharacteristicUUID") ??  {
+      let uuid = UUID().uuidString
+      defaults.set(uuid, forKey: "TagCharacteristicUUID")
+      return uuid
+    }())
+    
+    tagService = TagService(serviceuuid: serviceUUID, characteristicuuid: characteristicUUID)
+    
+    advertisementData = [CBAdvertisementDataServiceUUIDsKey: [tagService.serviceUUID]] as [String : Any]
     super.init()
     if ProcessInfo.processInfo.operatingSystemVersion.minorVersion == 3 {
       updateTag(tagged: false)
@@ -88,7 +108,7 @@ class BLEManager: NSObject, ObservableObject {
     log.info("updating tag status")
     transition(tagged: tagged)
     self.tagged = tagged
-    UserDefaults.standard.set(tagged, forKey: "isTagged")
+    defaults.set(tagged, forKey: "isTagged")
   }
   
   
@@ -101,8 +121,8 @@ class BLEManager: NSObject, ObservableObject {
       log.info("Got tagged; transitioning to peripheral")
       central?.stopScan()
       
-      TagService.service.characteristics = [TagService.characteristic]
-      peripheral?.add(TagService.service)
+      tagService.service.characteristics = [tagService.characteristic]
+      peripheral?.add(tagService.service)
       peripheral?.startAdvertising(advertisementData)
       
     } else {
@@ -135,13 +155,13 @@ class BLEManager: NSObject, ObservableObject {
   private func retrievePeripherals() {
     
     if let myCentral = central {
-      let knownConnectedPeripherals: [CBPeripheral] = myCentral.retrieveConnectedPeripherals(withServices: [TagService.serviceUUID])
+      let knownConnectedPeripherals: [CBPeripheral] = myCentral.retrieveConnectedPeripherals(withServices: [tagService.serviceUUID])
       if knownConnectedPeripherals.isEmpty == false {
         discoveredPeripherals = knownConnectedPeripherals
       }
     
-      log.info("centralDelegate retrievingPeripherals is scanning for service: \(TagService.serviceUUID)")
-      myCentral.scanForPeripherals(withServices: [TagService.serviceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+      log.info("centralDelegate retrievingPeripherals is scanning for service: \(self.tagService.serviceUUID)")
+      myCentral.scanForPeripherals(withServices: [tagService.serviceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
       // create a timeout for the last person discovered
       
     } else {
@@ -154,8 +174,8 @@ class BLEManager: NSObject, ObservableObject {
   
   private func preparePeripheral(peripheral: CBPeripheralManager) {
     log.info("preparing peripheral")
-    TagService.service.characteristics = [TagService.characteristic]
-    peripheral.add(TagService.service)
+    tagService.service.characteristics = [tagService.characteristic]
+    peripheral.add(tagService.service)
     peripheral.startAdvertising(advertisementData)
     return
   }
@@ -183,7 +203,7 @@ extension BLEManager: CBCentralManagerDelegate {
       default:
         log.info("Currently tagged; acting as peripheral")
       }
-      log.info("centralManagerDidUpdateState scanning for services with CBUUID: \(TagService.serviceUUID)")
+      log.info("centralManagerDidUpdateState scanning for services with CBUUID: \(self.tagService.serviceUUID)")
     case CBManagerState.poweredOff :
       log.info("centralManagerDidUpdateState powered off")
       central.stopScan()
@@ -229,7 +249,7 @@ extension BLEManager: CBCentralManagerDelegate {
     currentlyConnectedPeripheral = peripheral
     discoveredPeripherals?.append(peripheral)
     currentlyConnectedPeripheral?.delegate = self
-    currentlyConnectedPeripheral?.discoverServices([TagService.serviceUUID])
+    currentlyConnectedPeripheral?.discoverServices([tagService.serviceUUID])
   }
   
   
@@ -283,8 +303,8 @@ extension BLEManager: CBPeripheralDelegate {
     }
     log.info("peripheralDelegate didDiscoverServices discovered services for peripheral \(peripheral.identifier)")
     guard let peripheralServices = peripheral.services else {return}
-    for service in peripheralServices {
-      peripheral.discoverCharacteristics([TagService.characteristicUUID], for: service)
+    for service in peripheralServices where service.uuid == tagService.serviceUUID {
+      peripheral.discoverCharacteristics([tagService.characteristicUUID], for: service)
     }
   }
   
@@ -299,7 +319,7 @@ extension BLEManager: CBPeripheralDelegate {
     }
     guard let serviceCharacteristics = service.characteristics else { return }
     
-    for characteristic in serviceCharacteristics where characteristic.uuid == TagService.characteristicUUID {
+    for characteristic in serviceCharacteristics where characteristic.uuid == tagService.characteristicUUID {
       log.info("peripheralDelegate didDiscoverCharactersticsFor discovered characteristic \(characteristic.uuid)")
       if let charData = characteristic.value {
         previousCharacteristicValue = String(data: charData, encoding: .utf8)
@@ -382,11 +402,11 @@ extension BLEManager: CBPeripheralManagerDelegate {
       case true:
 //        TagService.service.characteristics = [TagService.characteristic]
         
-        TagService.service.characteristics = [TagService.characteristic]
-        peripheral.add(TagService.service)
+        tagService.service.characteristics = [tagService.characteristic]
+        peripheral.add(tagService.service)
         peripheral.startAdvertising(advertisementData)
         
-        log.info("TagService service characteristics \(TagService.service.characteristics!.count)")
+        log.info("TagService service characteristics \(self.tagService.service.characteristics!.count)")
         
       default:
         log.info("Currently running; acting as central")
@@ -432,6 +452,7 @@ extension BLEManager: CBPeripheralManagerDelegate {
   /* TEST METHODS */
   
   /* This callback can be used to transition and write the connected BLEManager's peripheral's uuid */
+  /* on a write receive we then need to actually modify the characteristics value */
   func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
     /*
      Use this function to write the connected manager's peripherals uuid
@@ -443,7 +464,7 @@ extension BLEManager: CBPeripheralManagerDelegate {
         continue
       }
       
-      
+      peripheral.respond(to: request, withResult: .success)
       log.info("peripheralManagerDelegate didReceiveWrite with value: \(uuid)")
       uuidToConnectTo = UUID(uuidString: uuid)
       log.info("peripheralManagerDelegate didReceiveWrite uuidToConnectTo updated value to: \(self.uuidToConnectTo?.uuidString ?? "no value")")

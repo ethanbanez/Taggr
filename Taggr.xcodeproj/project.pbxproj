@@ -23,6 +23,9 @@
 		E79E5111298D23F3004036B8 /* TaggrTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E5110298D23F3004036B8 /* TaggrTests.swift */; };
 		E79E511B298D23F3004036B8 /* TaggrUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E511A298D23F3004036B8 /* TaggrUITests.swift */; };
 		E79E511D298D23F3004036B8 /* TaggrUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79E511C298D23F3004036B8 /* TaggrUITestsLaunchTests.swift */; };
+		E7F6308129AA88D60032A568 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F6308029AA88D60032A568 /* Group.swift */; };
+		E7F6308329AA94440032A568 /* GroupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F6308229AA94440032A568 /* GroupService.swift */; };
+		E7F6308529AB47B00032A568 /* PersonalTagService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F6308429AB47B00032A568 /* PersonalTagService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +66,9 @@
 		E79E511A298D23F3004036B8 /* TaggrUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrUITests.swift; sourceTree = "<group>"; };
 		E79E511C298D23F3004036B8 /* TaggrUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggrUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		E79E512C298D28F2004036B8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E7F6308029AA88D60032A568 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		E7F6308229AA94440032A568 /* GroupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupService.swift; sourceTree = "<group>"; };
+		E7F6308429AB47B00032A568 /* PersonalTagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalTagService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +149,7 @@
 		E79E50F9298D23F0004036B8 /* Taggr */ = {
 			isa = PBXGroup;
 			children = (
+				E7F6307E29AA88A00032A568 /* Lambda */,
 				E723294A298E6EAA00FF45EA /* Taggr.xcdatamodeld */,
 				E79E512C298D28F2004036B8 /* Info.plist */,
 				E79E50FA298D23F0004036B8 /* TaggrApp.swift */,
@@ -187,9 +194,27 @@
 		E79E5129298D2402004036B8 /* Connectivity */ = {
 			isa = PBXGroup;
 			children = (
+				E7F6307F29AA88B20032A568 /* Groups */,
 				E76AC5792991C5D50024474C /* Bluetooth */,
 			);
 			path = Connectivity;
+			sourceTree = "<group>";
+		};
+		E7F6307E29AA88A00032A568 /* Lambda */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Lambda;
+			sourceTree = "<group>";
+		};
+		E7F6307F29AA88B20032A568 /* Groups */ = {
+			isa = PBXGroup;
+			children = (
+				E7F6308029AA88D60032A568 /* Group.swift */,
+				E7F6308229AA94440032A568 /* GroupService.swift */,
+				E7F6308429AB47B00032A568 /* PersonalTagService.swift */,
+			);
+			path = Groups;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -325,11 +350,14 @@
 				E79E5104298D23F3004036B8 /* Persistence.swift in Sources */,
 				E76AC57D2991D2CD0024474C /* BLEPeripheral.swift in Sources */,
 				E72D981529A3F8500069E736 /* PeripheralView.swift in Sources */,
+				E7F6308129AA88D60032A568 /* Group.swift in Sources */,
 				E7232939298DC28F00FF45EA /* Subsytems.swift in Sources */,
 				E723294C298E6EAA00FF45EA /* Taggr.xcdatamodeld in Sources */,
 				E75EE85D299F521B00066145 /* StatusView.swift in Sources */,
 				E76AC57B2991C5EA0024474C /* BLECentral.swift in Sources */,
 				E7285DFE299824A0000B31F4 /* BLEManager.swift in Sources */,
+				E7F6308329AA94440032A568 /* GroupService.swift in Sources */,
+				E7F6308529AB47B00032A568 /* PersonalTagService.swift in Sources */,
 				E76AC57F2991DB980024474C /* TagService.swift in Sources */,
 				E79E50FB298D23F0004036B8 /* TaggrApp.swift in Sources */,
 				E75EE85F299F5EF800066145 /* TaggrAppDelegate.swift in Sources */,

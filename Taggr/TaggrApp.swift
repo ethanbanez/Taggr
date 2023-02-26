@@ -27,9 +27,13 @@ struct TaggrApp: App {
   init() {
     log.info("App is being initialized")
     /* used to initialize anything the app needs */
-    if !defaults.bool(forKey: "isTagged") {
+    if defaults.object(forKey: "isTagged") == nil {
       // sets the tag status to false at the launch of the app
       defaults.set(false, forKey: "isTagged")
+    }
+    
+    if defaults.object(forKey: "inGroup") == nil {
+      defaults.set(false, forKey: "inGroup")
     }
   }
   var body: some Scene {

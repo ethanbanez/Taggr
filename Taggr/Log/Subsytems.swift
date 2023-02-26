@@ -10,18 +10,20 @@ import Foundation
 private let bundleID = Bundle.main.bundleIdentifier!
 
 enum Subsystem: String, CaseIterable, CustomStringConvertible {
-  case connectivity, networking, peristence, lifecycle
+  case tag, networking, peristence, lifecycle, group
   
   var description: String {
     switch self {
-    case .connectivity:
-      return bundleID + ".connectivity"
+    case .tag:
+      return bundleID + ".tag"
     case .networking:
       return bundleID + ".networking"
     case .peristence:
       return bundleID + ".persistence"
     case .lifecycle:
       return bundleID + ".lifecycle"
+    case .group:
+      return bundleID + ".group"
     }
   }
 }

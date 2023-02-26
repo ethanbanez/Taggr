@@ -17,7 +17,7 @@ import os
  */
 
 class BLECentral: NSObject, ObservableObject {
-  let log = Logger(subsystem: Subsystem.connectivity.description, category: "BLECentral")
+  let log = Logger(subsystem: Subsystem.tag.description, category: "BLECentral")
   var manager: CBCentralManager
   let uuid: String
   init(uuid: String) {

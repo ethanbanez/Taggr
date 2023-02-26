@@ -1,25 +1,16 @@
 //
-//  TagService.swift
+//  PersonalTagService.swift
 //  Taggr
 //
-//  Created by Ethan Bañez on 2/6/23.
+//  Created by Ethan Bañez on 2/25/23.
 //
 
 import Foundation
 import CoreBluetooth
 import os
 
-/*
- Tag Service should be unique for each group made but the same for all devices in the group
-    so that the central know what to write to */
-/*
- There should be a personal tagService… and then a group Tag service for being written to when you join a group and someone else started it
- personal services are only read from while public services which are when you're finding are written to.
- 
- The service needs to be mutable to change for different groups and such
- */
 
-struct TagService {
+struct PersonalTagService {
   var serviceUUID: CBUUID {
     didSet {
       UserDefaults.standard.set(serviceUUID.uuidString, forKey: "TagServiceUUID")
