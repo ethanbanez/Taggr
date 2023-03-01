@@ -11,19 +11,9 @@ import os
 
 
 struct PersonalTagService {
-  var serviceUUID: CBUUID {
-    didSet {
-      UserDefaults.standard.set(serviceUUID.uuidString, forKey: "TagServiceUUID")
-      service = CBMutableService(type: serviceUUID, primary: true)
-    }
-  }
+  var serviceUUID: CBUUID
   
-  var characteristicUUID: CBUUID {
-    didSet {
-      UserDefaults.standard.set(serviceUUID.uuidString, forKey: "TagCharacteristicUUID")
-      characteristic = CBMutableCharacteristic(type: characteristicUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
-    }
-  }
+  var characteristicUUID: CBUUID
   
   var service: CBMutableService
   var characteristic: CBMutableCharacteristic

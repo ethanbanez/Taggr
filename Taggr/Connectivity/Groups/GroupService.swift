@@ -14,27 +14,36 @@ private let groupServiceUUID = CBUUID(string: "4E38F580-9DAF-460D-9A40-B28F696C4
 // these two uuids should change on group creation
 private let localCurrentTagServiceUUID = CBUUID(string: "FE8908C0-D338-42AF-9C24-4E4FB1CAE395")
 private let localCurrentTagCharacteristicUUID = CBUUID(string: "A67039CF-9332-40AD-9B6B-E7851D094356")
+private let localReadyCharacteristicUUID = CBUUID(string: "C09EC5CD-2573-4C0C-82B2-B3259E195D53")
+private let localReadyToTagCharacteristicUUID = CBUUID(string: "7951F562-37B9-4BB0-977E-2F130139FC66")
 
 
-let shared = GroupService()
 
 
 /* this service is used for disseminating the TagService to look for */
 class GroupService {
   
   // service UUID used to discover the other peripherals that have this service
-  static var serviceUUID = groupServiceUUID
-  static var service: CBMutableService = CBMutableService(type: groupServiceUUID, primary: true)
+  let serviceUUID = groupServiceUUID
+  let service: CBMutableService = CBMutableService(type: groupServiceUUID, primary: true)
   
   // service characteristic UUID used to write to the other peripherals the real TagServiceUUID of the sending device
-  static var tagServiceUUID = localCurrentTagServiceUUID
+  let tagServiceUUID = localCurrentTagServiceUUID
   
   // characteristic characteristic UUID used to write to the other peripherals the real TagCharacteristicUUID of the sending device
-  static var tagCharacteristicUUID = localCurrentTagCharacteristicUUID
+  let tagCharacteristicUUID = localCurrentTagCharacteristicUUID
   
-  static var tagServiceCharacteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: localCurrentTagServiceUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
+  let readyCharacteristicUUID = localReadyCharacteristicUUID
   
-  static var tagCharacteristicCharacteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: localCurrentTagCharacteristicUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
+  let readyToTagCharacteristicUUID = localReadyToTagCharacteristicUUID
+  
+  let tagServiceCharacteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: localCurrentTagServiceUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
+  
+  let tagCharacteristicCharacteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: localCurrentTagCharacteristicUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
+  
+  let readyCharacteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: localReadyCharacteristicUUID, properties: [.read, .indicate, .write], value: nil, permissions: [.readable, .writeable])
+  
+  let readyToTagCharacteristic: CBMutableCharacteristic = CBMutableCharacteristic(type: localReadyToTagCharacteristicUUID, properties: [.write, .indicate], value: nil, permissions: [.writeable])
   
 }
 

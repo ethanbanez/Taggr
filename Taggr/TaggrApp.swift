@@ -15,7 +15,7 @@ struct TaggrApp: App {
   /* delegate for reinstantiating BLECentral and BLEPeripheral */
   @UIApplicationDelegateAdaptor private var taggrAppDelegate: TaggrAppDelegate
   
-  let defaults = UserDefaults.standard
+  private let defaults = UserDefaults.standard
   
   /* persistence used for leaderboard stats and pins */
   let persistenceController = PersistenceController.shared
@@ -38,7 +38,8 @@ struct TaggrApp: App {
   }
   var body: some Scene {
     WindowGroup {
-      StatusView()
+      GroupCreationView()
+        .frame(minWidth: 800,  minHeight: 600)
         .environment(\.managedObjectContext, persistenceController.container.viewContext)
 //        .environmentObject(bluetoothManager)        /* this puts a single instance of bluetoothManager in the environment for all views to access */
     }

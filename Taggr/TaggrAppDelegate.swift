@@ -11,13 +11,11 @@ import SwiftUI
 import CoreBluetooth
 import os
 
+private let defaults = UserDefaults.standard
 
 class TaggrAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
   
   private var log = Logger(subsystem: Subsystem.lifecycle.description, category: "AppDelegate")
-  
-  /* No bluetooth manager inserted into the environment before this… */
-//  @EnvironmentObject private var bluetoothManager: BLEManager
   
   var centralManager: CBCentralManager?
   var peripheralManager: CBPeripheralManager?
@@ -64,16 +62,31 @@ class TaggrAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
        Therefore:
           Set up the bluetooth manager with its delegates
        */
-      let centralUUID: UUID = UUID()
-      let peripheralUUID: UUID = UUID()
       
-      centralManager = CBCentralManager(delegate: BLEManager.shared, queue: .main, options: [CBCentralManagerOptionRestoreIdentifierKey: centralUUID.uuidString])
-      BLEManager.shared.central = centralManager
-      BLEManager.shared.centralUUID = centralUUID
+      // may need to store this in UserDefaults as well so that it's the same every time for this device… since I don't think state restoration restores from a fully destroyed app
+      let centralUUID: String = defaults.string(forKey: "CBCentralManagerUUID") ?? {
+        log.info("storing the centralUUID UserDefaults")
+        let uuid = UUID().uuidString
+        defaults.set(uuid, forKey: "CBCentralManagerUUID")
+        return uuid
+      }()
       
-      peripheralManager = CBPeripheralManager(delegate: BLEManager.shared, queue: .main, options: [CBPeripheralManagerOptionRestoreIdentifierKey: peripheralUUID.uuidString])
-      BLEManager.shared.peripheral = peripheralManager
-      BLEManager.shared.peripheralUUID = peripheralUUID
+      let peripheralUUID: String = defaults.string(forKey: "CBPeripheralManagerUUID") ?? {
+        log.info("storing the peripheralUUID UserDefaults")
+        let uuid = UUID().uuidString
+        defaults.set(uuid, forKey: "CBPeripheralManagerUUID")
+        return uuid
+      }()
+      
+      log.info("init with central: \(centralUUID)")
+      log.info("init with peripheral: \(peripheralUUID)")
+      centralManager = CBCentralManager(delegate: BLEGroup.shared, queue: .main)    // do state preservation later…
+      BLEGroup.shared.central = centralManager
+//      BLEGroup.shared.centralUUID = UUID(uuidString: centralUUID)
+      
+      peripheralManager = CBPeripheralManager(delegate: BLEGroup.shared, queue: .main)
+      BLEGroup.shared.peripheral = peripheralManager
+//      BLEGroup.shared.peripheralUUID = UUID(uuidString: peripheralUUID)
       
       
       log.info("willFinishLaunchingWithOptions no launch options. Creating central and peripheral managers with new uuids")
@@ -130,5 +143,17 @@ class TaggrAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     /*
      Save any relevant information to user defaults
      */
+    // stop advertising and such
+    log.info("app is being terminated")
+    
+    if defaults.bool(forKey: "inGroup") {
+      BLEManager.shared.peripheral?.removeAllServices()
+      BLEManager.shared.peripheral?.stopAdvertising()
+      BLEManager.shared.central?.stopScan()
+    } else {
+      BLEGroup.shared.peripheral?.removeAllServices()
+      BLEGroup.shared.peripheral?.stopAdvertising()
+      BLEGroup.shared.central?.stopScan()
+    }
   }
 }

@@ -26,20 +26,32 @@ import os
  allow it to be assigned to a central and peripheral at the start of the app so that the central and peripheral managers can be reinstantiated
  */
 
-let defaults = UserDefaults.standard
+private let defaults = UserDefaults.standard
 
 class BLEManager: NSObject, ObservableObject {
   
   static let shared = BLEManager()
   
   private let log: Logger = Logger(subsystem: Subsystem.tag.description, category: "BLEManager")
-  @Published var tagged: Bool
+  @Published var tagged: Bool {
+    didSet {
+      UserDefaults.standard.set(tagged, forKey: "isTagged")
+    }
+  }
   @Published var discoveredPeripherals: [CBPeripheral]?
   
   // BLEManager variables
   /* we need to receive these objects from somewhere else… in the initializer? */
-  var central: CBCentralManager?
-  var peripheral: CBPeripheralManager?
+  var central: CBCentralManager? {
+    didSet {
+      central?.delegate = self
+    }
+  }
+  var peripheral: CBPeripheralManager? {
+    didSet {
+      peripheral?.delegate = self
+    }
+  }
   
   /* these are the uuids of the peripheral and central objects that it is managing */
   // how will I get these though if BLEManager isn't the one that makes them?
@@ -89,9 +101,9 @@ class BLEManager: NSObject, ObservableObject {
     
     advertisementData = [CBAdvertisementDataServiceUUIDsKey: [tagService.serviceUUID]] as [String : Any]
     super.init()
-    if ProcessInfo.processInfo.operatingSystemVersion.minorVersion == 3 {
-      updateTag(tagged: false)
-    }
+//    if ProcessInfo.processInfo.operatingSystemVersion.minorVersion == 3 {
+//      updateTag(tagged: false)
+//    }
     log.info("BLEManager completed initialization")
   }
   
@@ -99,18 +111,18 @@ class BLEManager: NSObject, ObservableObject {
   deinit {
     central?.stopScan()
     central = nil
+    peripheral?.removeAllServices()
     peripheral?.stopAdvertising()
     peripheral = nil
     log.info("BLEManager is deinitialized")
   }
   
+  
   private func updateTag(tagged: Bool) {
     log.info("updating tag status")
     transition(tagged: tagged)
     self.tagged = tagged
-    defaults.set(tagged, forKey: "isTagged")
   }
-  
   
   /*
    Transition from either central/peripheral to the other to reflect transitions from not tagged/tagged
@@ -162,6 +174,10 @@ class BLEManager: NSObject, ObservableObject {
     
       log.info("centralDelegate retrievingPeripherals is scanning for service: \(self.tagService.serviceUUID)")
       myCentral.scanForPeripherals(withServices: [tagService.serviceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+      
+      // be careful about this call… I don't know how it works
+      let peripheralToConnectTo = retrievePeripheral(uuid: uuidToConnectTo!)
+      myCentral.connect(peripheralToConnectTo)
       // create a timeout for the last person discovered
       
     } else {
@@ -183,6 +199,20 @@ class BLEManager: NSObject, ObservableObject {
   // View methods
   
   
+  public func beginTagging() {
+    
+    // set a timer here for when the game begins
+    
+    updateTag(tagged: true)
+  }
+  
+  
+  public func beginRunning() {
+    updateTag(tagged: false)
+  }
+  
+  
+  
 }
 
 /*
@@ -197,13 +227,13 @@ extension BLEManager: CBCentralManagerDelegate {
       /* when bluetooth is powered on then we can start scanning. But we want to only scan when we're not peripheral not just when we're on... */
     case CBManagerState.poweredOn :
       log.info("centralManagerDidUpdateState powered on")
-      switch tagged {
-      case false:
-        retrievePeripherals()
-      default:
-        log.info("Currently tagged; acting as peripheral")
-      }
-      log.info("centralManagerDidUpdateState scanning for services with CBUUID: \(self.tagService.serviceUUID)")
+//      switch tagged {
+//      case false:
+//        retrievePeripherals()
+//      default:
+//        log.info("Currently tagged; acting as peripheral")
+//      }
+//      log.info("centralManagerDidUpdateState scanning for services with CBUUID: \(self.tagService.serviceUUID)")
     case CBManagerState.poweredOff :
       log.info("centralManagerDidUpdateState powered off")
       central.stopScan()
@@ -246,7 +276,6 @@ extension BLEManager: CBCentralManagerDelegate {
     log.info("centralDelegate didConnect stopped scanning")
     
     /* set the peripheral delegate to the current BLEManager */
-    currentlyConnectedPeripheral = peripheral
     discoveredPeripherals?.append(peripheral)
     currentlyConnectedPeripheral?.delegate = self
     currentlyConnectedPeripheral?.discoverServices([tagService.serviceUUID])
@@ -398,28 +427,16 @@ extension BLEManager: CBPeripheralManagerDelegate {
     case CBManagerState.poweredOn :
       log.info("peripheralManagerDidUpdateState powered on")
       
-      switch tagged {
-      case true:
-//        TagService.service.characteristics = [TagService.characteristic]
-        
-        tagService.service.characteristics = [tagService.characteristic]
-        peripheral.add(tagService.service)
-        peripheral.startAdvertising(advertisementData)
-        
-        log.info("TagService service characteristics \(self.tagService.service.characteristics!.count)")
-        
-      default:
-        log.info("Currently running; acting as central")
-      }
-      
     case CBManagerState.poweredOff :
       log.info("peripheralManagerDidUpdateState powered off")
       
       /*
        should remove services here and stop advertising
        */
+      if peripheral.isAdvertising {
+        peripheral.stopAdvertising()
+      }
       peripheral.removeAllServices()
-      peripheral.stopAdvertising()
     case CBManagerState.resetting :
       log.info("peripheralManagerDidUpdateState resetting")
     case CBManagerState.unknown :

@@ -13,13 +13,39 @@ import SwiftUI
  */
 struct PeripheralView: View {
   
-  var bluetoothManager = BLEManager.shared
+  @ObservedObject var blegroup = BLEGroup.shared
+  
+  @AppStorage("TagServiceUUID", store: .standard) var tagService: String = (UserDefaults.standard.string(forKey: "TagServiceUUID") ?? "")
+  @AppStorage("TagCharacteristicUUID", store: .standard) var tagCharacteristic: String = (UserDefaults.standard.string(forKey: "TagCharacteristicUUID") ?? "")
   
   var body: some View {
-    ForEach(bluetoothManager.discoveredPeripherals!, id: \.self, content: {
-      peripheral in Text(peripheral.description).onTapGesture {
-        bluetoothManager.central?.connect(peripheral)
+    VStack(alignment: .center, spacing: 20) {
+      if blegroup.ready == true {
+        Text("READY")
+          .foregroundColor(.green)
+          .font(.largeTitle)
+          .background(Circle()
+            .foregroundColor(.orange)
+            .frame(minWidth: 150, minHeight: 150))
+      } else {
+        Text("WAITING")
+          .foregroundColor(.green)
+          .font(.largeTitle)
+          .background(Circle()
+            .foregroundColor(.orange)
+            .frame(minWidth: 150, minHeight: 150))
       }
-    })
+      VStack {
+        Text(tagService)
+        Text(tagCharacteristic)
+      }.padding(.top, 100)
+    }
+  }
+}
+
+
+struct PeripheralViewsPreviews: PreviewProvider {
+  static var previews: some View {
+    PeripheralView()
   }
 }

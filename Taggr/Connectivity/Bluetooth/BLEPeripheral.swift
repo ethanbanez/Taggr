@@ -15,7 +15,7 @@ import os
 
 /* As a peripheral, tagged, the service you advertise is the tagged service */
 class BLEPeripheral: NSObject, ObservableObject {
-  private let log = Logger(subsystem: Subsystem.connectivity.description, category: "BLEPeripheral")
+  private let log = Logger(subsystem: Subsystem.tag.description, category: "BLEPeripheral")
   var manager: CBPeripheralManager
   let uuid: String
   init(uuid: String) {

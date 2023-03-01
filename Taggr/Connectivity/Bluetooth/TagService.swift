@@ -20,17 +20,29 @@ import os
  */
 
 struct TagService {
+  var servicesWrittenTo = 0
+  
+  var configured: Bool = false
+  
   var serviceUUID: CBUUID {
     didSet {
       UserDefaults.standard.set(serviceUUID.uuidString, forKey: "TagServiceUUID")
       service = CBMutableService(type: serviceUUID, primary: true)
+      servicesWrittenTo += 1
+      if servicesWrittenTo >= 2 {
+        configured = true
+      }
     }
   }
   
   var characteristicUUID: CBUUID {
     didSet {
-      UserDefaults.standard.set(serviceUUID.uuidString, forKey: "TagCharacteristicUUID")
+      UserDefaults.standard.set(characteristicUUID.uuidString, forKey: "TagCharacteristicUUID")
       characteristic = CBMutableCharacteristic(type: characteristicUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
+      servicesWrittenTo += 1
+      if servicesWrittenTo >= 2 {
+        configured = true
+      }
     }
   }
   
@@ -45,5 +57,16 @@ struct TagService {
     service = CBMutableService(type: serviceuuid, primary: true)
     characteristic = CBMutableCharacteristic(type: characteristicuuid, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
   }
+  
 }
+
+extension TagService {
+  func tagServiceReady() -> Bool {
+    if servicesWrittenTo >= 2 {
+      return true
+    }
+    return false
+  }
+}
+
 
