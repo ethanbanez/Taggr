@@ -110,12 +110,12 @@
 			path = PickGroupCreation;
 			sourceTree = "<group>";
 		};
-		E7232937298DC28400FF45EA /* Log */ = {
+		E7232937298DC28400FF45EA /* Logging */ = {
 			isa = PBXGroup;
 			children = (
 				E7232938298DC28F00FF45EA /* Subsytems.swift */,
 			);
-			path = Log;
+			path = Logging;
 			sourceTree = "<group>";
 		};
 		E76AC571298EE0190024474C /* Views */ = {
@@ -129,7 +129,7 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		E76AC5792991C5D50024474C /* Bluetooth */ = {
+		E76AC5792991C5D50024474C /* Tagging */ = {
 			isa = PBXGroup;
 			children = (
 				E7285DFD299824A0000B31F4 /* BLEManager.swift */,
@@ -137,7 +137,7 @@
 				E76AC57C2991D2CD0024474C /* BLEPeripheral.swift */,
 				E76AC57E2991DB980024474C /* TagService.swift */,
 			);
-			path = Bluetooth;
+			path = Tagging;
 			sourceTree = "<group>";
 		};
 		E790CF8A29AEBA7100ADA932 /* UserDefaultsObservation */ = {
@@ -181,8 +181,8 @@
 				E76AC571298EE0190024474C /* Views */,
 				E79E50FE298D23F3004036B8 /* Assets.xcassets */,
 				E79E5103298D23F3004036B8 /* Persistence.swift */,
-				E79E5129298D2402004036B8 /* Connectivity */,
-				E7232937298DC28400FF45EA /* Log */,
+				E79E5129298D2402004036B8 /* Bluetooth */,
+				E7232937298DC28400FF45EA /* Logging */,
 				E79E5100298D23F3004036B8 /* Preview Content */,
 			);
 			indentWidth = 2;
@@ -215,14 +215,14 @@
 			path = TaggrUITests;
 			sourceTree = "<group>";
 		};
-		E79E5129298D2402004036B8 /* Connectivity */ = {
+		E79E5129298D2402004036B8 /* Bluetooth */ = {
 			isa = PBXGroup;
 			children = (
 				E790CF8A29AEBA7100ADA932 /* UserDefaultsObservation */,
-				E7F6307F29AA88B20032A568 /* Groups */,
-				E76AC5792991C5D50024474C /* Bluetooth */,
+				E7F6307F29AA88B20032A568 /* GroupCreation */,
+				E76AC5792991C5D50024474C /* Tagging */,
 			);
-			path = Connectivity;
+			path = Bluetooth;
 			sourceTree = "<group>";
 		};
 		E7F6307E29AA88A00032A568 /* Lambda */ = {
@@ -232,14 +232,14 @@
 			path = Lambda;
 			sourceTree = "<group>";
 		};
-		E7F6307F29AA88B20032A568 /* Groups */ = {
+		E7F6307F29AA88B20032A568 /* GroupCreation */ = {
 			isa = PBXGroup;
 			children = (
 				E7F6308029AA88D60032A568 /* BLEGroup.swift */,
 				E7F6308229AA94440032A568 /* GroupService.swift */,
 				E7F6308429AB47B00032A568 /* PersonalTagService.swift */,
 			);
-			path = Groups;
+			path = GroupCreation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
