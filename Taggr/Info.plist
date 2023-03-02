@@ -5,6 +5,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Bluetooth is used to scan for members of your tagging group without which you wouldn&apos;t be able to play.</string>

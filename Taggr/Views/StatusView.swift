@@ -8,19 +8,29 @@
 import Foundation
 import SwiftUI
 
-struct AppView: View {
-  
-  /* we expect to find a bluetooth manager in the environment */
-  @EnvironmentObject var bluetoothManager: BLEManager
+struct StatusView: View {
   
   /* we access the bluetooth managers published property */
+  
+  @ObservedObject var bluetoothManager = BLEManager.shared    // gain access to the shared bluetooth manager singleton
+  
   var body: some View {
-    Text(bluetoothManager.tagged.description)
+    HStack (alignment: .top) {
+      Text("Tag Status:").bold()
+      Text(bluetoothManager.tagged.description)
+    }.padding(.bottom)
+    HStack (alignment: .center, spacing: 12) {
+      if (bluetoothManager.discoveredPeripherals != nil) {
+        PeripheralView()
+      } else {
+        Text("No peripherals discovered")
+      }
+    }
   }
 }
 
 struct StatusView_Preview: PreviewProvider {
   static var previews: some View {
-    AppView()
+    StatusView()
   }
 }

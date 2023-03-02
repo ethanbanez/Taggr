@@ -17,15 +17,15 @@ import os
  */
 
 class BLECentral: NSObject, ObservableObject {
-  let log = Logger(subsystem: Subsystem.connectivity.description, category: "BLECentral")
+  let log = Logger(subsystem: Subsystem.tag.description, category: "BLECentral")
   var manager: CBCentralManager
   let uuid: String
   init(uuid: String) {
     self.uuid = uuid
     /* Possibly add other options? Like a list of peripherals to look out for? */
-    manager = CBCentralManager(delegate: nil, queue: .main, options: [CBCentralManagerOptionRestoreIdentifierKey: uuid])
+    manager = CBCentralManager(delegate: nil, queue: .global(), options: [CBCentralManagerOptionShowPowerAlertKey: false])
     super.init()
-    log.info("BLECentral is initialized")
+    log.info("BLECentral is initialized with uuid: \(uuid)")
     
     /* do we need these options? */
 //    manager.registerForConnectionEvents(options: [CBConnectionEventMatchingOption(rawValue: CBConnectPeripheralOptionNotifyOnNotificationKey): true, CBConnectionEventMatchingOption(rawValue: CBConnectPeripheralOptionNotifyOnConnectionKey): true])
