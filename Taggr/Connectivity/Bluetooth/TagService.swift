@@ -20,29 +20,21 @@ import os
  */
 
 struct TagService {
-  var servicesWrittenTo = 0
-  
-  var configured: Bool = false
+  private var servicesWrittenTo = 0
   
   var serviceUUID: CBUUID {
     didSet {
       UserDefaults.standard.set(serviceUUID.uuidString, forKey: "TagServiceUUID")
       service = CBMutableService(type: serviceUUID, primary: true)
       servicesWrittenTo += 1
-      if servicesWrittenTo >= 2 {
-        configured = true
-      }
     }
   }
   
   var characteristicUUID: CBUUID {
     didSet {
       UserDefaults.standard.set(characteristicUUID.uuidString, forKey: "TagCharacteristicUUID")
-      characteristic = CBMutableCharacteristic(type: characteristicUUID, properties: [.write, .read], value: nil, permissions: [.writeable, .readable])
+      characteristic = CBMutableCharacteristic(type: characteristicUUID, properties: [.read], value: nil, permissions: [.readable])
       servicesWrittenTo += 1
-      if servicesWrittenTo >= 2 {
-        configured = true
-      }
     }
   }
   

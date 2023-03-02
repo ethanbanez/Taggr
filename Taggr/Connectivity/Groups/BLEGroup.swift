@@ -54,6 +54,8 @@ class BLEGroup: NSObject, ObservableObject {
   private var groupService: GroupService = GroupService()
   private var service: CBMutableService
   
+  private var transitionState: Bool?
+  
   
   override init() {
     // I don't think we should set this on the outset… wait for the ui to tell us what to do
@@ -74,10 +76,6 @@ class BLEGroup: NSObject, ObservableObject {
     }())
     
     log.info("initializing BLEGroup")
-    //    log.info("personal tag service initialized as \(serviceUUID.uuidString)")
-    //    log.info("personal tag characteristic initialized as \(characteristicUUID.uuidString)")
-    
-    // if the personalTagService is already initialized here with the right uuids from either the past or for the first time and it's not set anywhere else do I need the didSet functionality? I don't think so…
     personalTagService = PersonalTagService(serviceuuid: serviceUUID, characteristicuuid: characteristicUUID)
     
     super.init()
@@ -85,8 +83,7 @@ class BLEGroup: NSObject, ObservableObject {
   
   
   func destroyGroupSession() {
-    // resets group call boolean
-    //    startedGroupCall = nil
+    startedGroupCall = nil
     ready = false
     if central?.isScanning ?? false && peripheral?.isAdvertising ?? false {
       log.info("destroying group session")
@@ -103,6 +100,7 @@ class BLEGroup: NSObject, ObservableObject {
   }
   
   
+  // peripherals only join
   func joinGroup() {
     log.info("starting group search")
     startedGroupCall = false
@@ -110,19 +108,14 @@ class BLEGroup: NSObject, ObservableObject {
     service.characteristics = [groupService.tagCharacteristicCharacteristic, groupService.tagServiceCharacteristic, groupService.readyCharacteristic, groupService.readyToTagCharacteristic]
     peripheral?.add(service)
     peripheral?.startAdvertising(advertisementData)
-    
-    central?.scanForPeripherals(withServices: [service.uuid], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
-    log.info("scanning for \(self.service.uuid.uuidString)")
   }
   
   
+  // centrals only create
   func createGroup() {
     log.info("starting group call")
     startedGroupCall = true
     ready = true
-    
-    peripheral?.add(service)
-    peripheral?.startAdvertising(advertisementData)
     
     central?.scanForPeripherals(withServices: [service.uuid], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     log.info("scanning for \(self.service.uuid.uuidString)")
@@ -137,7 +130,7 @@ class BLEGroup: NSObject, ObservableObject {
 extension BLEGroup: CBCentralManagerDelegate {
   
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
-    log.info("centralDelegate didUpdateState")
+    log.info("central didUpdateState")
     switch central.state {
     case .unknown:
       log.info("unknown state")
@@ -151,8 +144,6 @@ extension BLEGroup: CBCentralManagerDelegate {
       log.info("poweredOff state")
     case .poweredOn:
       log.info("poweredOn state")
-      /* Never scan for the same peripheral. Once a peripheral has been discovered then it will be in the knownPeripherals array and the work is done */
-      //      central.scanForPeripherals(withServices: [GroupService.service.uuid], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     @unknown default:
       log.error("unrecognized state")
     }
@@ -163,7 +154,8 @@ extension BLEGroup: CBCentralManagerDelegate {
     currentPeripheral = peripheral
     connectedPeripherals?[currentPeripheral!.identifier] = currentPeripheral
     currentPeripheral?.delegate = self
-    // rssi between -50 and -30 is a strong connection, hopefully indicating they are close enough
+    
+    // rssi indicates signal strength
     if RSSI.intValue >= -80 {
       let alreadyConnectedPeripherals: [CBPeripheral] = central.retrieveConnectedPeripherals(withServices: [service.uuid])
       // only connect if this central has not connected before
@@ -185,24 +177,12 @@ extension BLEGroup: CBCentralManagerDelegate {
    peripheral. Otherwise, connecting is enough I believe…
    */
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-    log.info("centralDelegate didConnect successful")
+    log.info("central didConnect successful")
     
     // if this central started the group call then we want to disseminate the TagService
     // along with disseminating to others we should set our own TagService to our personal TagService
     currentlyConnectedPeripherals?[peripheral.identifier] = peripheral.name ?? "Unnamed device"
-    
-    if startedGroupCall! {
-      currentPeripheral!.discoverServices([service.uuid])
-      
-      // add personal tag service to self as self is the group creator and therefore the service is this
-      //      BLEManager.shared.tagService.serviceUUID = personalTagService.serviceUUID
-      //      BLEManager.shared.tagService.characteristicUUID = personalTagService.characteristicUUID
-    } else {
-      // if the device did not start the group call and yet is here and still searching then this is where we can stop because now we've connected. We may need to go farther to join the knownPeripherals array
-      
-      // so far as I can understand there is nothing to be done for a peripheral that has connected to a fellow searching device
-      log.info("staying connected but no data is needed")
-    }
+    currentPeripheral!.discoverServices([service.uuid])
   }
   
   
@@ -214,43 +194,30 @@ extension BLEGroup: CBCentralManagerDelegate {
     connectedPeripherals?.removeValue(forKey: peripheral.identifier)
     
     if let error = error {
-      log.info("centralDelegate error while disconnecting from peripheral: \(error.localizedDescription)")
+      log.info("central error while disconnecting from peripheral: \(error.localizedDescription)")
       return
     }
-    log.info("centralDelegate disconnected from peripheral: \(peripheral.identifier)")
+    log.info("central disconnected from peripheral: \(peripheral.identifier)")
   }
-  
-  
-  
-  //  func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
-  //    log.info("BLEGroup central is restoring state")
-  //  }
-  
 }
 
 
-// once we connect to a peripheral this will be called and the same device will get the peripheral callbacks
-
-/*
- these callbacks will be called by searching searching peripherals
- maybe the best place for these callbacks should be on the peripheral manager side… experiment
- */
 extension BLEGroup: CBPeripheralDelegate {
   
   // we read the rssi to test the connection
   func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
     if let error = error {
-      log.info("peripheralDelegate error reading RSSI value: \(error.localizedDescription)")
+      log.info("peripheral error reading RSSI value: \(error.localizedDescription)")
       return
     }
-    log.info("peripheralDelegate RSSI value successfully read")
+    log.info("peripheral RSSI value successfully read")
   }
   
   
   
   func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
     if let error = error {
-      log.info("peripheralDelegate error in discover services: \(error.localizedDescription)")
+      log.info("peripheral error in discover services: \(error.localizedDescription)")
       return
     }
     
@@ -259,7 +226,7 @@ extension BLEGroup: CBPeripheralDelegate {
     // at this point there should only be one service but just in case, check
     for service in peripheralServices where service.uuid == self.service.uuid {
       // discover both of the characteristics that the searching peripheral will have
-      peripheral.discoverCharacteristics([groupService.tagServiceUUID, groupService.tagCharacteristicUUID, groupService.readyCharacteristicUUID], for: service)
+      peripheral.discoverCharacteristics([groupService.tagServiceUUID, groupService.tagCharacteristicUUID, groupService.readyCharacteristicUUID, groupService.readyToTagCharacteristicUUID], for: service)
     }
   }
   
@@ -267,91 +234,69 @@ extension BLEGroup: CBPeripheralDelegate {
   
   func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
     if let error = error {
-      log.info("peripheralDelegate error discvoring characteristics: \(error.localizedDescription)")
+      log.info("peripheral error discvoring characteristics: \(error.localizedDescription)")
     }
     guard let groupCharacteristics = service.characteristics else {
-      log.info("peripheralDelegate no characteristics for service \(service.uuid)")
+      log.info("peripheral no characteristics for service \(service.uuid)")
       return
     }
     
-    /*
-     These two loops are where personal tag services are written. We need to write personal tag services. Not the general tag services which is what is happening here
-     */
-    // look for the required characteristic
-    log.info("tagService configured? : \(BLEManager.shared.tagService.configured.description)")
-//    if (BLEManager.shared.tagService.configured != true) {
-      
-      for tagServiceCharacteristic in groupCharacteristics where tagServiceCharacteristic.uuid == groupService.tagServiceUUID {
-        // this is where we write to the characteristic of the searching peripherals
-        /* Should have two characteristics to distinguish between the two uuids coming through */
-        let myTagServiceUUID = Data(personalTagService.serviceUUID.uuidString.utf8)
-        peripheral.writeValue(myTagServiceUUID, for: tagServiceCharacteristic, type: .withResponse)
-        log.info("peripheralDelegate writing to TagService characteristic")
-      }
-      
-      for tagCharacteristicCharacteristic in groupCharacteristics where tagCharacteristicCharacteristic.uuid == groupService.tagCharacteristicUUID {
-        // this is where we write to the characteristic of the searching peripherals
-        /* Should have two characteristics to distinguish between the two uuids coming through */
-        let myTagCharacteristicUUID = Data(personalTagService.characteristicUUID.uuidString.utf8)
-        peripheral.writeValue(myTagCharacteristicUUID, for: tagCharacteristicCharacteristic, type: .withResponse)
-        log.info("peripheralDelegate writing to TagCharacteristic characteristic")
-      }
-//    }
+    // writing tag service UUID
+    for tagServiceCharacteristic in groupCharacteristics where tagServiceCharacteristic.uuid == groupService.tagServiceUUID {
+      let myTagServiceUUID = Data(personalTagService.serviceUUID.uuidString.utf8)
+      peripheral.writeValue(myTagServiceUUID, for: tagServiceCharacteristic, type: .withResponse)
+      log.info("peripheral writing to TagService characteristic")
+    }
     
+    // writing tag characteristic UUID
+    for tagCharacteristicCharacteristic in groupCharacteristics where tagCharacteristicCharacteristic.uuid == groupService.tagCharacteristicUUID {
+      let myTagCharacteristicUUID = Data(personalTagService.characteristicUUID.uuidString.utf8)
+      peripheral.writeValue(myTagCharacteristicUUID, for: tagCharacteristicCharacteristic, type: .withResponse)
+      log.info("peripheral writing to TagCharacteristic characteristic")
+    }
+    
+    // characteristic to notify when ready
     for readyCharacteristic in groupCharacteristics where readyCharacteristic.uuid == groupService.readyCharacteristicUUID {
-      //      var connectedPeripherals = central?.retrieveConnectedPeripherals(withServices: [groupService.serviceUUID])
-      //      var peripheralIndex = Int.random(in: 0...connectedPeripherals!.count)
-      //      var taggedPeripheral = connectedPeripherals?[peripheralIndex]
-      //
-      //      if peripheralIndex > connectedPeripherals!.count {
-      //
-      //      } else {
-      //
-      //      }
-      //
-      //      if peripheral.identifier == taggedPeripheral?.identifier {
-      //        peripheral.writeValue(Data([1]), for: readyCharacteristic, type: .withResponse)
-      //      } else {
-      //        peripheral.writeValue(Data([0]), for: readyCharacteristic, type: .withResponse)
-      //      }
       peripheral.setNotifyValue(true, for: readyCharacteristic)
     }
-    
-    // if we have discovered this then the peripherals are all ready and we need to choose the peripheral to be tagged first
-    for readyToTagCharacteristic in groupCharacteristics where readyToTagCharacteristic.uuid == groupService.readyToTagCharacteristicUUID {
-      peripheral.setNotifyValue(true, for: readyToTagCharacteristic)
-    }
-    
   }
   
   
   func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
     
     if let error = error {
-      log.info("peripheralDelegate error while writing to characteristic: \(characteristic.uuid) with error: \(error.localizedDescription)")
+      log.info("peripheral error while writing to characteristic: \(characteristic.uuid) with error: \(error.localizedDescription)")
       return
     }
     
     if characteristic.uuid == groupService.tagServiceUUID {
       // therefore writing to the TagService
-      log.info("peripheralDelegate successfully written to TagService characteristic")
+      log.info("peripheral successfully written to TagService characteristic")
       return
     }
     
     if characteristic.uuid == groupService.tagCharacteristicUUID {
-      log.info("peripheralDelegate successfully written to TagCharacteristic characteristic")
+      log.info("peripheral successfully written to TagCharacteristic characteristic")
       return
     }
     
     if characteristic.uuid == groupService.readyCharacteristicUUID {
       log.info("tagger has been set")
     }
+    
+    
+    // the central (group starter) will transition to tagging phase. After all peripherals have been written to
+    if characteristic.uuid == groupService.readyToTagCharacteristicUUID {
+      log.info("all peripherals have been written to and now we may transition as well")
+      
+      if self.transitionState! == true {
+        BLEManager.shared.beginTagging()
+      } else {
+        BLEManager.shared.beginRunning()
+      }
+    }
   }
   
-  
-  func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-    log.info("getting notifications for: \(characteristic.uuid.uuidString)")
-  }
   
   
   // we get notifications here for whether a peripheral is ready or not
@@ -371,28 +316,69 @@ extension BLEGroup: CBPeripheralDelegate {
         
         readyPeripherals?[peripheral.identifier] = peripheral
         if readyPeripherals?.count == connectedPeripherals?.count {
-          log.info("all peripherals are ready")
-          log.info("received the clear to tag everyone")
           
-          // discover the characteristic to write which peripheral will be tagged
-          for p in central!.retrieveConnectedPeripherals(withServices: [groupService.serviceUUID]) {
-            guard let peripheralServices = p.services else {return}
-            for service in peripheralServices where service.uuid == self.service.uuid {
+          // theoretically inside this should only be called once
+          log.info("all peripherals are ready")
+          
+          let connectedPeripherals = central!.retrieveConnectedPeripherals(withServices: [groupService.serviceUUID])
+          
+          guard let p = connectedPeripherals.first(where: {$0.identifier == peripheral.identifier}) else {
+            log.info("no mathcing connected peripherals")
+            return
+          }
+          guard let peripheralServices = p.services else {
+            log.info("no services")
+            return
+          }
+          guard let service = peripheralServices.first(where: {$0.uuid == self.service.uuid}) else {
+            log.info("no matching services")
+            return
+          }
+          guard let groupCharacteristics = service.characteristics else {
+            log.info("no characteristics")
+            return
+          }
+          guard let readyToTagCharacteristic = groupCharacteristics.first(where: {$0.uuid == groupService.readyToTagCharacteristicUUID}) else {
+            log.info("no matching characteristics")
+            return
+          }
+          
+          let peripheralIndex = Int.random(in: 0...connectedPeripherals.count)
+          
+          log.info("index of chosen peripheral ==> \(peripheralIndex)")
+          
+          
+          // write to peripherals first before transitioning
+          
+          // if peripheralIndex == the count then that means it should be the central starting the call who is it
+          if peripheralIndex == connectedPeripherals.count {
+            for connectedPeripheral in connectedPeripherals {
               
-              // haven't updated the peripherals to have this characteristicUUID
-              // we've already discovered this characteristic we just need to write to it
-              // once we're actually ready… then we write
+              // for all the connected peripherals; tell them they are not it
+              // readyToTagCharacteristic will have already been discovered
+              connectedPeripheral.writeValue(Data([0x0]), for: readyToTagCharacteristic, type: .withResponse)
+            }
+            
+            transitionState = true
+            
+          } else {
+            transitionState = false
+            
+            // it's someone connected to us
+            let taggedPeripheral = connectedPeripherals[peripheralIndex]
+            taggedPeripheral.writeValue(Data([0x1]), for: readyToTagCharacteristic, type: .withResponse)
+            for connectedPeripheral in connectedPeripherals where connectedPeripheral.identifier != taggedPeripheral.identifier {
+              // for all the other connected peripherals; tell them they are not it
+              connectedPeripheral.writeValue(Data([0x0]), for: readyToTagCharacteristic, type: .withResponse)
             }
           }
           
         } else {
           log.info("peripheral is ready")
         }
-        
       } else {
         log.info("peripheral is not ready")
       }
-      
     }
     
     // this means we've discovered the characteristic and that we can now write to the characteristic
@@ -417,7 +403,7 @@ extension BLEGroup: CBPeripheralDelegate {
 extension BLEGroup: CBPeripheralManagerDelegate {
   
   func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-    log.info("peripheralManagerDelegate didUpdateState")
+    log.info("peripheral manager didUpdateState")
     switch peripheral.state {
     case .unknown:
       log.info("unknown state")
@@ -445,16 +431,16 @@ extension BLEGroup: CBPeripheralManagerDelegate {
   
   func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
     if let error = error {
-      log.info("peripheralManagerDelegate error adding service: \(error.localizedDescription)")
+      log.info("peripheral manager error adding service: \(error.localizedDescription)")
       return
     }
-    log.info("peripheralManagerDelegate added service: \(service.uuid)")
+    log.info("peripheral manager added service: \(service.uuid)")
   }
   
   
   func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
     if let error = error {
-      log.info("peripheralManagerDelegate error advertising: \(error.localizedDescription)")
+      log.info("peripheral manager error advertising: \(error.localizedDescription)")
       return
     }
     log.info("started advertising service with num of characteristics: \(self.service.characteristics?.count.description ?? "nil" )")
@@ -468,7 +454,7 @@ extension BLEGroup: CBPeripheralManagerDelegate {
     
     for request in requests {
       guard let requestValue = request.value else {
-        log.info("peripheralManagerDelegate no value in request")
+        log.info("peripheral manager no value in request")
         peripheral.respond(to: request, withResult: .unlikelyError)
         return
       }
@@ -478,8 +464,9 @@ extension BLEGroup: CBPeripheralManagerDelegate {
       var tagCharacteristic: UUID?
       
       
+      // writes the service to the BLEManager (tag manager)
       if request.characteristic.uuid == groupService.tagServiceUUID {
-        log.info("peripheralManagerDelegate received write request for uuid: \(request.characteristic.uuid.uuidString)")
+        log.info("peripheral manager received write request for uuid: \(request.characteristic.uuid.uuidString)")
         let uuidString = String(data: requestValue, encoding: .utf8)
         log.info("sending tag service to bleManager: \(uuidString!)")
         tagService = UUID(uuidString: uuidString!)!
@@ -487,12 +474,6 @@ extension BLEGroup: CBPeripheralManagerDelegate {
         BLEManager.shared.tagService.serviceUUID = CBUUID(nsuuid: tagService!)
         if BLEManager.shared.tagService.tagServiceReady() {
           log.info("tag service is fully configured and ready for tagging")
-          
-          // the following should remove and add a service allowing the central to discover the new characteristic… it may have to start scanning again though…
-          //          service.characteristics?.append(groupService.readyCharacteristic)
-          //          self.peripheral?.removeAllServices()
-          //          self.peripheral?.add(service)
-          
           ready = true
           return
         }
@@ -500,47 +481,35 @@ extension BLEGroup: CBPeripheralManagerDelegate {
       
       
       if request.characteristic.uuid == groupService.tagCharacteristicUUID {
-        log.info("peripheralManagerDelegate received write request for uuid: \(request.characteristic.uuid.uuidString)")
+        log.info("peripheral manager received write request for uuid: \(request.characteristic.uuid.uuidString)")
         let uuidString = String(data: requestValue, encoding: .utf8)
-        log.info("sending tag characteristic bleManager: \(uuidString!)")
+        log.info("sending tag characteristic to bleManager: \(uuidString!)")
         tagCharacteristic = UUID(uuidString: uuidString!)!
         peripheral.respond(to: request, withResult: .success)
         BLEManager.shared.tagService.characteristicUUID = CBUUID(nsuuid: tagCharacteristic!)
         if BLEManager.shared.tagService.tagServiceReady() {
           log.info("tag service is fully configured and ready for tagging")
-          
-          //          log.info("adding ready characteristic and restarting service")
-          //          service.characteristics?.append(groupService.readyCharacteristic)
-          //
-          //          // removing the service doesn't do anything to fix the problem of leaving the ui…
-          //          self.peripheral?.removeAllServices()
-          //          self.peripheral?.add(service)
           ready = true
           return
         }
       }
       
       
-      //      if request.characteristic.uuid == groupService.readyCharacteristicUUID {
-      //        log.info("receiving tag assignment")
-      //        var tagged = [UInt8](requestValue)
-      //        if tagged[0] == 1 {
-      //          BLEManager.shared.beginTagging()
-      //        } else {
-      //          BLEManager.shared.beginRunning()
-      //        }
-      //      }
-      /*
-       here we should instantiate the TagService for the device…
-       
-       By writing to the manager of the device, anytime someone writes to this device the TagService is updated on the BLEManager TagService side which allows it to tag the right person.
-       This peripheral manager function is from the side of the device who did not start the group and therefore does not know, or have, the relevant uuids for the TagService and so this disseminates it to the devices BLEManager
-       After this has been accomplished we should wait for the game to start and the first device to be chosen to be the tagger in which we will scan for the service that was sent here and connect to the uuid, belonging to a specific CBPeripheral, that will be disseminated when that person is chosen
-       All of the group set up needs to be done in person with people close enough to each other for it to work.
-       */
+      // this is where the peripherals will disconnect first
+      if request.characteristic.uuid == groupService.readyToTagCharacteristicUUID {
+        log.info("being told whether we are starting out tagged or not")
+        
+        // the response from the central should be to then transition as well
+        peripheral.respond(to: request, withResult: .success)
+        
+        let tagged = [UInt8](requestValue)
+        if tagged[0] == 1 {
+          BLEManager.shared.beginTagging()
+        } else {
+          BLEManager.shared.beginRunning()
+        }
+      }
     }
-    
-    
   }
   
   
@@ -552,7 +521,7 @@ extension BLEGroup: CBPeripheralManagerDelegate {
       peripheral.updateValue(Data([0x0]), for: groupService.readyCharacteristic, onSubscribedCentrals: [central])
       return
     }
-    log.info("tag service is ready")
+    log.info("tag service is ready -> sending signal")
     peripheral.updateValue(Data([0x1]), for: groupService.readyCharacteristic, onSubscribedCentrals: [central])
   }
   
@@ -567,8 +536,4 @@ extension BLEGroup: CBPeripheralManagerDelegate {
     log.info("received read request for: \(request.characteristic.uuid.uuidString)")
   }
   
-  
-  //  func peripheralManager(_ peripheral: CBPeripheralManager, willRestoreState dict: [String : Any]) {
-  //    log.info("BLEGroup peripheral is restoring state")
-  //  }
 }

@@ -34,14 +34,6 @@ struct GroupCreationView: View {
           Button("Join Group", action: {
             blegroup.joinGroup()
           })
-          //        NavigationLink("Create group", destination: PeripheralView(), isActive: $isShowingDetailView) .simultaneousGesture(TapGesture().onEnded({
-          //          blegroup.createGroup()
-          //        }))
-          //        NavigationLink("Join group", destination: PeripheralView(), isActive: $isShowingDetailView) .simultaneousGesture(TapGesture().onEnded({
-          //          blegroup.joinGroup()
-          //        })).onAppear(perform: {
-          //          blegroup.destroyGroupSession()
-          //        })
         }
       }
       }
