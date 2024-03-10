@@ -34,6 +34,6 @@ class BLECentral: NSObject, ObservableObject {
   deinit {
     /* when the app is cut off ideally we want to connect to the advertising peripheral which is `*/
     manager.stopScan()
-    log.info("BLECentral deinitializing")
+    log.info("BLECentral deinitializing bluetooth central")
   }
 }
